@@ -1,0 +1,5 @@
+classicalRNG                               Measures of the classical RNG task
+allRNG                                     Get all classical RNG measures
+
+check_y                                    Check vector
+findTPIs                                   Find turning points

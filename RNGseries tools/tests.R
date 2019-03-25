@@ -1,3 +1,7 @@
+library(plyr)
+library(tidyverse)
+library(casnet)
+
 
 # dummy data --------------------------------------------------------------
 df <- sample(c(1:9), 100, replace = TRUE)
@@ -17,3 +21,52 @@ y <- df$value
 
 minScale <- 1
 maxScale <- 9
+
+
+
+
+
+
+
+
+
+
+
+
+
+# symHelper <- function(sym_num){
+#   out <- sym_num
+#   i <- 1
+#   same <- 0
+#   while(i<=length(sym_num)){
+#     if(sym_num[i]%in%c("increase","decrease")){
+#       samesame <- TRUE
+#       r <- i+1
+#       same <- 0
+#       while(samesame){
+#         if(sym_num[r]%in%"same"){
+#           same <- same+1
+#           r <- r+1
+#         } else {
+#           samesame <- FALSE
+#         }
+#       }
+#       if(same>0){
+#
+#         if(all(!sym_num[i]%in%c("increase"),sym_num[i+same+1]%in%c("peak","increase"))){
+#           out[i:(i+same)] <- "trough"
+#         } else {
+#           if(all(!sym_num[i]%in%c("decrease")&sym_num[i+same+1]%in%c("trough","decrease"))){
+#             out[i:(i+same)] <- "peak"
+#           }
+#         }
+#       }
+#     }
+#     if(same>0){
+#       i <- (i+same)
+#     } else {
+#       i <- i+1
+#     }
+#   }
+#   return(out)
+# }
