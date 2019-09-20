@@ -8,8 +8,12 @@ df <- sample(c(1:9), 100, replace = TRUE)
 
 df_s<-ts_symbolic(df$value)
 
-df <- rio::import("~/Documents/Projects/RNGproject/wouteR/random sequence.tsv")
+df <- rio::import("~/Documents/Projects/RNGproject/wouteR/Data_totaal.csv")
 y <- df$value
+
+randseqR::PhiIndex(y,minScale = 1, maxScale = 9, responseAlternatives = c(1,2,3,4,5,6,7,8,9))
+
+
 # general -----------------------------------------------------------------
 # response alternatives (a) max = 9
 # RNG <- function(df, a) {}

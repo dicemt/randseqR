@@ -41,7 +41,8 @@ repDistance(y, minScale = NA, maxscale = NA)
 
 repGap(y, minScale = NA, maxScale = NA)
 
-PhiIndex(y)
+PhiIndex(y, minScale = NA, maxScale = NA, responseAlternatives = NA,
+  maxOrder = 7)
 }
 \arguments{
 \item{y}{A sequence of symbols. If \code{y} is non-numeric, unique elements will be labelled by an integer value.}
@@ -49,6 +50,10 @@ PhiIndex(y)
 \item{maxScale}{Maximum expected value. If \code{y} is a character vector this should refer to the highest numeric code used.}
 
 \item{minScale}{Minimum expected value. If \code{y} is a character vector this should refer to the lowest numeric code used.}
+
+\item{responseAlternatives}{An optional vector of possible response alternatives. If \code{NA}, \code{responseAlternatives} will be set to \code{seq(minScale,maxScale)}}
+
+\item{maxOrder}{}
 }
 \value{
 Output

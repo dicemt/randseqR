@@ -4,10 +4,10 @@
 \alias{allRNG}
 \title{Get all classical RNG measures}
 \usage{
-allRNG(y, minScale = NA, maxScale = NA, R = TRUE, RNG = TRUE,
-  RNG2 = TRUE, RF = TRUE, Coupon = TRUE, NSQ = TRUE,
-  Adjacency = TRUE, TPI = TRUE, PhaseLength = TRUE, Runs = TRUE,
-  RepDistance = TRUE, RepGap = TRUE, Phi = TRUE)
+allRNG(y, minScale = NA, maxScale = NA, responseAlternatives = NA,
+  R = TRUE, RNG = TRUE, RNG2 = TRUE, RF = TRUE, Coupon = TRUE,
+  NSQ = TRUE, Adjacency = TRUE, TPI = TRUE, PhaseLength = TRUE,
+  Runs = TRUE, RepDistance = TRUE, RepGap = TRUE, Phi = TRUE)
 }
 \arguments{
 \item{y}{A sequence of symbols. If \code{y} is non-numeric, unique elements will be labelled by an integer value.}
@@ -15,6 +15,8 @@ allRNG(y, minScale = NA, maxScale = NA, R = TRUE, RNG = TRUE,
 \item{minScale}{Minimum expected value. If \code{y} is a character vector this should refer to the lowest numeric code used.}
 
 \item{maxScale}{Maximum expected value. If \code{y} is a character vector this should refer to the highest numeric code used.}
+
+\item{responseAlternatives}{An optional vector of possible response alternatives. If \code{NA}, \code{responseAlternatives} will be set to \code{seq(minScale,maxScale)}}
 
 \item{R}{Redundancy (default = \code{TRUE})}
 

@@ -2,6 +2,7 @@
 
 export("%>%")
 export(.data)
+export(PhiIndex)
 export(allRNG)
 export(check_y)
 export(enexpr)
