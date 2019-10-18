@@ -197,7 +197,7 @@ allRNG <- function(y, minScale=NA, maxScale=NA, responseAlternatives = NA,
                       ){
 
 #disp('not implemented yet')
-
+#blah
   y <- check_y(y, minScale = minScale, maxScale = maxScale, responseAlternatives = responseAlternatives)
   minScale <- attr(y,"minScale")
   maxScale <- attr(y,"maxScale")
