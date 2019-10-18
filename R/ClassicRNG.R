@@ -586,35 +586,36 @@ repGap <- function(y, minScale = NA, maxScale = NA){
 PhiIndex <- function(y, minScale = NA, maxScale = NA, responseAlternatives = NA, maxOrder = 7){
 
   y <- check_y(y, minScale = minScale, maxScale = maxScale, responseAlternatives = responseAlternatives)
-  minScale <- attr(y,"minScale")
-  maxScale <- attr(y,"maxScale")
+  minIndex <- attr(y,"minScale")
+  maxIndex <- attr(y,"maxScale")
   responseAlternatives <- attr(y,"responseAlternatives")
 
   Nresp   <- NROW(y)
   setSize <- length(responseAlternatives)
 
-  if(maxOrder>Nresp-1){
-    stop("maxOrder cannot be larger than N-1")
+  if(maxOrder>Nresp){
+    stop("maxOrder cannot be larger than N")
   }
 
-  PhiArray <- cbind(expand.grid(Phi = 2:maxOrder, RespAlt = minIndex:maxIndex),matrix(0,ncol=length(1:maxIndex)))
+  PhiArray <- cbind(expand.grid(Phi = 2:maxOrder, RespAlt = minIndex:maxIndex),matrix(0,ncol=maxOrder))
 
-  lookup <- data.frame(DescTools::CombSet(c(0,1),7,repl=TRUE, ord = TRUE),0)
-  colnames(lookup) <- c(paste0("pos",1:7),"freq")
+  lookup <- data.frame(DescTools::CombSet(c(0,1),maxOrder,repl=TRUE, ord = TRUE),0)
+  colnames(lookup) <- c(paste0("pos",1:maxOrder),"freq")
 
   phiArrayList <- phiObsPredList <- phiObsFreqList <- phiList <- list()
 
-  PhiFreq <- data.frame(respIns = minIndex:maxIndex, freq = as.numeric(table(y)))
+  PhiFreq <- data.frame(respIns = minIndex:maxIndex, freq = 0)
+  PhiFreq$freq <- plyr::laply(PhiFreq$respIns,function(n) sum(y==n, na.rm = TRUE))
   PhiFreq$invFreq <-  Nresp-PhiFreq$freq
 
-  phiObsPred <- matrix(0,2,2, dimnames = list(c("repeat.pred","alternate.pred"),c("repeat.obs","alternate.obs")))
+  phiObsPred <- matrix(0,2,2, dimnames = list(c("obs","pred"),c("repeat","alternate")))
 
   for(A in 2:maxOrder){
     phiObsFreq <- list()
     phiArray <- data.frame(DescTools::CombSet(c(0,1),A,repl=TRUE, ord = TRUE),0)
     colnames(phiArray) <- c(paste0("pos",1:A),"freq")
-    sameInd <- phiArray[1]==phiArray[A]
-    diffInd <- phiArray[1]!=phiArray[A]
+    sameInd <- phiArray[1]==phiArray[A] #phiArray[1]==1&phiArray[A]==1&(phiArray[1]==phiArray[A])
+    diffInd <- phiArray[1]!=phiArray[A] #&(phiArray[1]!=0|phiArray[A]!=0)
     for(B in 1:setSize){
       lookup  <- data.frame(DescTools::CombSet(c(0,1),A,repl=TRUE, ord = TRUE),0)
       colnames(lookup) <- c(paste0("pos",1:A),"freq")
@@ -634,8 +635,8 @@ PhiIndex <- function(y, minScale = NA, maxScale = NA, responseAlternatives = NA,
       for(r in 1:NROW(lookup)){
         BinString <- lookup[r,1:A]
         if(A==2){
-          freq1   <- PhiFreq[B,ifelse(O[1]==1,2,3)]
-          freq2   <- PhiFreq[B,ifelse(O[2]==1,2,3)]
+          freq1   <- PhiFreq[B,ifelse(BinString[1]==1,2,3)]
+          freq2   <- PhiFreq[B,ifelse(BinString[2]==1,2,3)]
           freqMid <- Nresp
         } else {
           tmp     <- phiObsFreqList[[(A-1)]][[B]]
@@ -658,10 +659,12 @@ PhiIndex <- function(y, minScale = NA, maxScale = NA, responseAlternatives = NA,
         } else {
           result <- 0
         }
-        if(BinString[1]==BinString[A]){
+        if(BinString[1]==BinString[A]){ #all(BinString[1]==1,BinString[A]==1,BinString[1]==BinString[A])
           phiObsPred[2,1] <- phiObsPred[2,1] + result
         } else {
-          phiObsPred[2,2] <- phiObsPred[2,2] + result
+         # if(all(BinString[1]!=BinString[A])){
+            phiObsPred[2,2] <- phiObsPred[2,2] + result
+        #  }
         }
         # rm(BinString,string1,string2,stringMid,freqMid,freq1,freq2,result)
       } #r
@@ -675,8 +678,8 @@ PhiIndex <- function(y, minScale = NA, maxScale = NA, responseAlternatives = NA,
     phiObsPredList[[A]] <- phiObsPred
 
     a1 <- phiObsPred[1,1]
-    a3 <- phiObsPred[1,2]
-    a2 <- phiObsPred[2,1]
+    a2 <- phiObsPred[1,2]
+    a3 <- phiObsPred[2,1]
     a4 <- phiObsPred[2,2]
     Den <- sum(phiObsPred, na.rm = TRUE)
 
@@ -687,21 +690,22 @@ PhiIndex <- function(y, minScale = NA, maxScale = NA, responseAlternatives = NA,
       AA4 <- ((a2 + a4) * (a3 + a4)) / Den
     }
 
-    B1 <- ((a1-AA1)**2 / AA1)%00%0
-    B2 <- ((a2-AA2)**2 / AA2)%00%0
-    B3 <- ((a3-AA3)**2 / AA3)%00%0
-    B4 <- ((a4-AA4)**2 / AA4)%00%0
+    B1 <- ((a1-AA1)^2 / AA1)%00%0
+    B2 <- ((a2-AA2)^2 / AA2)%00%0
+    B3 <- ((a3-AA3)^2 / AA3)%00%0
+    B4 <- ((a4-AA4)^2 / AA4)%00%0
 
     s <- 1
-    if(a1>a4){s <- -1}
+    if(a2>a4){s <- -1}
 
-    phiList[[A]] <- s*(sqrt((B1 + B2 + B3 + B4)/(setSize*Nresp)))
+    phiList[[A]] <- s*(sqrt((B1 + B2 + B3 + B4)/(setSize*Nresp))*100)
 
     rm(a1,a2,a3,a4,AA1,AA2,AA3,AA4,B1,B2,B3,B4,s, Den)
 
   } # A
 
-  names(phiList) <- paste0("phi",2:maxOrder)
+  names(phiList) <- c(NA,paste0("phi",2:maxOrder))
+  phiList[[1]] <- NULL
 
   return(phiList)
 }

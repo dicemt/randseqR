@@ -1,17 +1,21 @@
 library(plyr)
 library(tidyverse)
+library(invctr)
 library(casnet)
 
 
 # dummy data --------------------------------------------------------------
 df <- sample(c(1:9), 100, replace = TRUE)
 
+
 df_s<-ts_symbolic(df$value)
 
 df <- rio::import("~/Documents/Projects/RNGproject/wouteR/Data_totaal.csv")
-y <- df$value
 
-randseqR::PhiIndex(y,minScale = 1, maxScale = 9, responseAlternatives = c(1,2,3,4,5,6,7,8,9))
+df <- rio::import("~/Documents/Projects/RNGproject/wouteR/random sequence.tsv")
+y <- df$value
+y <- c(2,1)
+randseqR::PhiIndex(y = y, minScale = 1, maxScale = 9, responseAlternatives = c(1,2,3,4,5,6,7,8,9))
 
 
 # general -----------------------------------------------------------------
