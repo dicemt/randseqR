@@ -49,10 +49,15 @@ check_y <- function(y, minScale=NA, maxScale=NA, noZero = FALSE, toNumeric = TRU
   if(any(is.na(minScale),is.na(maxScale))&any(is.na(responseAlternatives))){
     stop("Must provide either minScale & maxScale, or, responseAlternatives (or both)")
   }
+  if(is.na(responseAlternatives)&all(!is.na(minScale),!is.na(maxScale))){
+    responseAlternatives <- minScale:maxScale
+  } else {
+    stop("Must provide minScale & maxScale to generate responseAlternatives")
+  }
 
   if(!is.numeric(y)){
     if(toNumeric){
-      y <- casnet::as.numeric_discrete(y, sort.unique = TRUE)
+      y <- casnet::as.numeric_discrete(y, sortUnique = TRUE)
       transformation <- c(transformation,'toNumeric')
     } else {
       stop("y is a non-numeric vector! Assign numbers to unique elements of y.")
@@ -608,11 +613,10 @@ PhiIndex <- function(y, minScale = NA, maxScale = NA, responseAlternatives = NA,
   PhiFreq$freq <- plyr::laply(PhiFreq$respIns,function(n) sum(y==n, na.rm = TRUE))
   PhiFreq$invFreq <-  Nresp-PhiFreq$freq
 
-  phiObsPred <- matrix(0,2,2, dimnames = list(c("obs","pred"),c("repeat","alternate")))
-
   for(A in 2:maxOrder){
+    phiObsPred <- matrix(0,2,2, dimnames = list(c("obs","pred"),c("repeat","alternate")))
     phiObsFreq <- list()
-    phiArray <- data.frame(DescTools::CombSet(c(0,1),A,repl=TRUE, ord = TRUE),0)
+    phiArray   <- data.frame(DescTools::CombSet(c(0,1),A,repl=TRUE, ord = TRUE),0)
     colnames(phiArray) <- c(paste0("pos",1:A),"freq")
     sameInd <- phiArray[1]==phiArray[A] #phiArray[1]==1&phiArray[A]==1&(phiArray[1]==phiArray[A])
     diffInd <- phiArray[1]!=phiArray[A] #&(phiArray[1]!=0|phiArray[A]!=0)
@@ -627,6 +631,7 @@ PhiIndex <- function(y, minScale = NA, maxScale = NA, responseAlternatives = NA,
           if(y[C+D]==B){O[Pos] <- 1}
           Pos <- Pos-1
         } #D
+        O <- rev(O)
         lookup$freq[rowSums(t(t(lookup[1:A]) == O))==A] <- lookup$freq[rowSums(t(t(lookup[1:A]) == O))==A] + 1
       } # C series length -A
       phiObsFreq[[B]] <- lookup
