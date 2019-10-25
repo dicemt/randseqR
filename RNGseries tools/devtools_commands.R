@@ -28,7 +28,7 @@ usethis::use_gpl3_license(name = c("Fred Hasselman; Wouter Oomens"))
 usethis::use_pkgdown()
 
 
-tools::Rdindex(RdFiles = "~/Documents/GitHub/randseqR/man",outFile = "INDEX")
+tools::Rdindex(RdFiles = "C:/Users/woomens/Documents/GitHub/randseqR/man",outFile = "INDEX")
 devtools::document(roclets=c('rd', 'collate', 'namespace','vignette'))
 devtools::build_vignettes()
 devtools::install(build_vignettes = TRUE)
