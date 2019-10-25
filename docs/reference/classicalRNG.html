@@ -36,7 +36,7 @@
 
 
 <meta property="og:title" content="Measures of the classical RNG task — classicalRNG" />
-<meta property="og:description" content="Individual funcations to get the measures of the classical RNG task. Use function allRNG() to get a list with all (or selected) measures." />
+<meta property="og:description" content="Individual functions to get the measures of the classical RNG task. Use function allRNG() to get a list with all (or selected) measures." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -111,34 +111,34 @@
     </div>
 
     <div class="ref-description">
-    <p>Individual funcations to get the measures of the classical RNG task. Use function <code><a href='allRNG.html'>allRNG()</a></code> to get a list with all (or selected) measures.</p>
+    <p>Individual functions to get the measures of the classical RNG task. Use function <code><a href='allRNG.html'>allRNG()</a></code> to get a list with all (or selected) measures.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>Redundancy</span>(<span class='no'>y</span>, <span class='kw'>maxScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
+    <pre class="usage"><span class='fu'>Redundancy</span>(<span class='no'>y</span>, <span class='kw'>minScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>maxScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
 
 <span class='fu'>RNG</span>(<span class='no'>y</span>, <span class='kw'>minScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>maxScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
 
 <span class='fu'>RNG2</span>(<span class='no'>y</span>, <span class='kw'>minScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>maxScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
 
-<span class='fu'>RF</span>(<span class='no'>y</span>)
+<span class='fu'>RF</span>(<span class='no'>y</span>, <span class='kw'>minScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>maxScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
 
 <span class='fu'>Coupon</span>(<span class='no'>y</span>, <span class='kw'>minScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>maxScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
 
 <span class='fu'>NSQ</span>(<span class='no'>y</span>, <span class='kw'>minScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>maxScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
 
-<span class='fu'>Adjacency</span>(<span class='no'>y</span>)
+<span class='fu'>Adjacency</span>(<span class='no'>y</span>, <span class='kw'>minScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>maxScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
 
-<span class='fu'>TPI</span>(<span class='no'>y</span>)
+<span class='fu'>TPI</span>(<span class='no'>y</span>, <span class='kw'>minScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>maxScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
 
-<span class='fu'>PhL</span>(<span class='no'>y</span>)
+<span class='fu'>PhL</span>(<span class='no'>y</span>, <span class='kw'>minScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>maxScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
 
-<span class='fu'>Runs</span>(<span class='no'>y</span>)
+<span class='fu'>Runs</span>(<span class='no'>y</span>, <span class='kw'>minScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>maxScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
 
-<span class='fu'>repDistance</span>(<span class='no'>y</span>, <span class='kw'>minScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>maxscale</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
+<span class='fu'>repDistance</span>(<span class='no'>y</span>, <span class='kw'>minScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>maxScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
 
 <span class='fu'>repGap</span>(<span class='no'>y</span>, <span class='kw'>minScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>maxScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
 
-<span class='fu'>PhiIndex</span>(<span class='no'>y</span>, <span class='kw'>minScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>maxScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>responseAlternatives</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+<span class='fu'>phiIndex</span>(<span class='no'>y</span>, <span class='kw'>minScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>maxScale</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>responseAlternatives</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
   <span class='kw'>maxOrder</span> <span class='kw'>=</span> <span class='fl'>7</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -149,12 +149,12 @@
       <td><p>A sequence of symbols. If <code>y</code> is non-numeric, unique elements will be labelled by an integer value.</p></td>
     </tr>
     <tr>
-      <th>maxScale</th>
-      <td><p>Maximum expected value. If <code>y</code> is a character vector this should refer to the highest numeric code used.</p></td>
-    </tr>
-    <tr>
       <th>minScale</th>
       <td><p>Minimum expected value. If <code>y</code> is a character vector this should refer to the lowest numeric code used.</p></td>
+    </tr>
+    <tr>
+      <th>maxScale</th>
+      <td><p>Maximum expected value. If <code>y</code> is a character vector this should refer to the highest numeric code used.</p></td>
     </tr>
     <tr>
       <th>responseAlternatives</th>

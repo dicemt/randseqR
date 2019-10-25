@@ -6,8 +6,8 @@
 \usage{
 allRNG(y, minScale = NA, maxScale = NA, responseAlternatives = NA,
   R = TRUE, RNG = TRUE, RNG2 = TRUE, RF = TRUE, Coupon = TRUE,
-  NSQ = TRUE, Adjacency = TRUE, TPI = TRUE, PhaseLength = TRUE,
-  Runs = TRUE, RepDistance = TRUE, RepGap = TRUE, Phi = TRUE)
+  NSQ = TRUE, Adjacency = TRUE, TPI = TRUE, PhL = TRUE,
+  Runs = TRUE, repDistance = TRUE, repGap = TRUE, Phi = TRUE)
 }
 \arguments{
 \item{y}{A sequence of symbols. If \code{y} is non-numeric, unique elements will be labelled by an integer value.}
@@ -34,15 +34,15 @@ allRNG(y, minScale = NA, maxScale = NA, responseAlternatives = NA,
 
 \item{TPI}{TPI (default = \code{TRUE})}
 
-\item{PhaseLength}{PhaseLength (default = \code{TRUE})}
-
 \item{Runs}{Runs (default = \code{TRUE})}
+
+\item{Phi}{Phi index (default = \code{TRUE})}
+
+\item{PhaseLength}{PhaseLength (default = \code{TRUE})}
 
 \item{RepDistance}{Repetition Distance (default = \code{TRUE})}
 
 \item{RepGap}{Repetition Gap (default = \code{TRUE})}
-
-\item{Phi}{Phi index (default = \code{TRUE})}
 }
 \value{
 A list object of classical RNG task measures.
@@ -54,7 +54,7 @@ Get all classical RNG measures
 
 y <- round(runif(100,1,9))
 
-# Omit the Frequecny tables
+# Omit the Frequency tables
 allRNG(y, minScale = 1, maxScale = 9, RF = FALSE)
 
 }

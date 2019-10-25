@@ -122,7 +122,7 @@ check_y <- function(y, minScale=NA, maxScale=NA, noZero = FALSE, toNumeric = TRU
 #' @keywords internal
 #'
 first_occurence <- function(y, minScale, maxScale) {
-  return(max(plyr::laply(seq(minScale,maxScale), function(x) which.min(y == x)), na.rm = TRUE))
+  return(max(purrr::map_int(seq(minScale,maxScale), function(x) min(which(y == x), na.rm = TRUE)), na.rm = TRUE))
 }
 
 
@@ -177,53 +177,124 @@ observed_expected <- function(y, minScale, maxScale, lag = 1){
 #'
 #' y <- round(runif(100,1,9))
 #'
-#' # Omit the Frequecny tables
+#' # Omit the Frequency tables
 #' allRNG(y, minScale = 1, maxScale = 9, RF = FALSE)
 #'
-allRNG <- function(y, minScale=NA, maxScale=NA, responseAlternatives = NA,
-                      R      = TRUE,
-                      RNG    = TRUE,
-                      RNG2   = TRUE,
-                      RF     = TRUE,
-                      Coupon = TRUE,
-                      NSQ    = TRUE,
-                      Adjacency   = TRUE,
-                      TPI         = TRUE,
-                      PhaseLength = TRUE,
-                      Runs        = TRUE,
-                      RepDistance = TRUE,
-                      RepGap      = TRUE,
-                      Phi         = TRUE
-                      ){
+allRNG <- function(y,
+                   minScale=NA,
+                   maxScale=NA,
+                   responseAlternatives = NA,
+                   R           = TRUE,
+                   RNG         = TRUE,
+                   RNG2        = TRUE,
+                   RF          = TRUE,
+                   Coupon      = TRUE,
+                   NSQ         = TRUE,
+                   Adjacency   = TRUE,
+                   TPI         = TRUE,
+                   PhL         = TRUE,
+                   Runs        = TRUE,
+                   repDistance = TRUE,
+                   repGap      = TRUE,
+                   Phi         = TRUE
+                   ){
 
 #disp('not implemented yet')
-#blah
-  y <- check_y(y, minScale = minScale, maxScale = maxScale, responseAlternatives = responseAlternatives)
+  y        <- check_y(y, minScale = minScale, maxScale = maxScale, responseAlternatives = NA)
   minScale <- attr(y,"minScale")
   maxScale <- attr(y,"maxScale")
   responseAlternatives <- attr(y,"responseAlternatives")
 
-  Nresp <- NROW(y)
-
   if(R){
-    Redundancy <- Redundancy(y = y, maxScale = maxScale)
+    Redundancy <- Redundancy(y = y, minScale = minScale, maxScale = maxScale)
   }
 
   if(RNG){
-    RNG <- RNG(y = y,minScale = minScale, maxScale = maxScale)
+    RNG <- RNG(y = y, minScale = minScale, maxScale = maxScale)
   }
 
+  if(RNG2){
+    RNG2 <- RNG2(y = y, minScale = minScale, maxScale = maxScale)
+  }
+
+  if(RF){
+    RF <- RF(y = y, minScale = minScale, maxScale = maxScale)
+  }
+
+  if(Coupon){
+    Coupon <- Coupon(y = y, minScale = minScale, maxScale = maxScale)
+  }
+
+  if(NSQ){
+    NSQ <- NSQ(y = y, minScale = minScale, maxScale = maxScale)
+  }
+
+  if(Adjacency){
+    Adjacency <- Adjacency(y = y, minScale = minScale, maxScale = maxScale)
+  }
+
+  if(TPI){
+    TPI <- TPI(y = y, minScale = minScale, maxScale = maxScale)
+  }
+
+  if(PhL){
+    PhL <- PhL(y = y, minScale = minScale, maxScale = maxScale)
+  }
+
+  if(Runs){
+    Runs <- Runs(y = y, minScale = minScale, maxScale = maxScale)
+  }
+
+  if(repDistance){
+    repDistance <- repDistance(y = y, minScale = minScale, maxScale = maxScale)
+  }
+
+  if(repGap){
+    repGap <- repGap(y = y, minScale = minScale, maxScale = maxScale)
+  }
 
   if(Phi){
-    PhiIndex <- PhiIndex(y = y,minScale = minScale, maxScale = maxScale)
+    phiIndex <- phiIndex(y = y, minScale = minScale, maxScale = maxScale)
   }
+
+  out <- list("Reduncany"      = Redundancy,
+              "RNG"            = RNG,
+              "RNG2"           = RNG2,
+              "RF_1"           = RF$`1`,
+              "RF_2"           = RF$`2`,
+              "RF_3"           = RF$`3`,
+              "RF_4"           = RF$`4`,
+              "RF_5"           = RF$`5`,
+              "RF_6"           = RF$`6`,
+              "RF_7"           = RF$`7`,
+              "RF_8"           = RF$`8`,
+              "RF_9"           = RF$`9`,
+              "Coupon"         = Coupon,
+              "NSQ"            = NSQ,
+              "Adj_ascending"  = Adjacency$Adj_ascending,
+              "Adj_descending" = Adjacency$Adj_descending,
+              "Adj_combined"   = Adjacency$Adj_combined,
+              "TPI"            = TPI,
+              "phaselength"    = PhL,
+              "Runs"           = Runs,
+              "repDistance"    = repDistance,
+              "RD_median"      = repGap$RD_median,
+              "RD_mean"        = repGap$RD_mean,
+              "RD_mode"        = repGap$RD_mode,
+              "phi2"           = phiIndex$phi2,
+              "phi3"           = phiIndex$phi3,
+              "phi4"           = phiIndex$phi4,
+              "phi5"           = phiIndex$phi5,
+              "phi6"           = phiIndex$phi6,
+              "phi7"           = phiIndex$phi7)
+
+  return(out)
 
 }
 
-
 #' Measures of the classical RNG task
 #'
-#' Individual funcations to get the measures of the classical RNG task. Use function `allRNG()` to get a list with all (or selected) measures.
+#' Individual functions to get the measures of the classical RNG task. Use function `allRNG()` to get a list with all (or selected) measures.
 #'
 #' @param y A sequence of symbols. If `y` is non-numeric, unique elements will be labelled by an integer value.
 #' @param minScale Minimum expected value. If `y` is a character vector this should refer to the lowest numeric code used.
@@ -243,25 +314,21 @@ allRNG <- function(y, minScale=NA, maxScale=NA, responseAlternatives = NA,
 #'
 NULL
 
-
-
 # Redundancy --------------------------------------------------------------
 
 
 #' Redundancy
 #' @rdname classicalRNG
-Redundancy<- function(y, maxScale = NA){
-  # Hsingle <- log2(n) - 1/n * sum(table(y)*log2(table(y)))
-  # Hmax    <- log2(maxScale)
-  # R <- 100 * (1 - (Hsingle/Hmax))
+Redundancy <- function(y, minScale = NA, maxScale = NA){
 
-  y <- check_y(y, maxScale = maxScale, noZero = TRUE)
+  y        <- check_y(y, minScale = minScale, maxScale = maxScale)
+  minScale <- attr(y,'minScale')
   maxScale <- attr(y,'maxScale')
 
   R <- 100 * (1 - ((log2(NROW(y)) - 1/NROW(y) * sum(table(y)*log2(table(y)))) / log2(maxScale)))
 
-  attr(R,'Name') <- 'Redundancy'
-  attr(R,'y') <- y
+  attr(R,'Name')     <- 'Redundancy'
+  attr(R,'y')        <- y
   attr(R,'maxScale') <- maxScale
 
   return(R)
@@ -271,13 +338,13 @@ Redundancy<- function(y, maxScale = NA){
 
 #' RNG
 #' @rdname classicalRNG
-RNG <- function(y, minScale=NA, maxScale=NA){
+RNG <- function(y, minScale = NA, maxScale = NA){
 
-  y <- check_y(y, minScale=minScale, maxScale=maxScale)
+  y        <- check_y(y, minScale = minScale, maxScale = maxScale)
   minScale <- attr(y,'minScale')
   maxScale <- attr(y,'maxScale')
 
-  o_e <- observed_expected(y, minScale = minScale, maxScale = maxScale, lag = 1)
+  o_e      <- observed_expected(y, minScale = minScale, maxScale = maxScale, lag = 1)
 
   combis   <- o_e$combis
   observed <- o_e$observed
@@ -286,8 +353,8 @@ RNG <- function(y, minScale=NA, maxScale=NA){
   freqs <- plyr::ldply(combis, function(c){data.frame(pair=c,freq=sum(observed%in%c))})
   RNG   <- sum(freqs$freq * log(freqs$freq),na.rm = TRUE) / sum(Afreq*log(Afreq), na.rm = TRUE)
 
-  attr(RNG,'Name') <- 'RNG'
-  attr(RNG,'y') <- y
+  attr(RNG,'Name')     <- 'RNG'
+  attr(RNG,'y')        <- y
   attr(RNG,'minScale') <- minScale
   attr(RNG,'maxScale') <- maxScale
 
@@ -298,39 +365,40 @@ RNG <- function(y, minScale=NA, maxScale=NA){
 
 #' RNG2
 #' @rdname classicalRNG
-RNG2 <- function(y, minScale=NA, maxScale=NA){
+RNG2 <- function(y, minScale = NA, maxScale = NA){
 
-  y <- check_y(y, minScale = minScale, maxScale = maxScale)
+  y        <- check_y(y, minScale = minScale, maxScale = maxScale)
   minScale <- attr(y,'minScale')
   maxScale <- attr(y,'maxScale')
 
-  o_e <- observed_expected(y, minScale = minScale, maxScale = maxScale, lag = 2)
+  o_e      <- observed_expected(y, minScale = minScale, maxScale = maxScale, lag = 2)
 
   combis   <- o_e$combis
   observed <- o_e$observed
 
   Afreq <- table(y)
   freqs <- plyr::ldply(combis, function(c){data.frame(pair=c,freq=sum(observed%in%c))})
-  RNG2 <- sum(freqs$freq * log(freqs$freq),na.rm = TRUE) / sum(Afreq*log(Afreq), na.rm = TRUE)
+  RNG2  <- sum(freqs$freq * log(freqs$freq),na.rm = TRUE) / sum(Afreq*log(Afreq), na.rm = TRUE)
 
-  attr(RNG2,'Name') <- 'RNG2'
-  attr(RNG2,'y') <- y
+  attr(RNG2,'Name')     <- 'RNG2'
+  attr(RNG2,'y')        <- y
   attr(RNG2,'minScale') <- minScale
   attr(RNG2,'maxScale') <- maxScale
 
   return(RNG2)
 }
 
-
 # Response frequencies ----------------------------------------------------
 
 #' RF
 #' @rdname classicalRNG
-RF <- function(y){
+RF <- function(y, minScale = NA, maxScale = NA){
 
-  y <- check_y(y)
+  y        <- check_y(y, minScale = minScale, maxScale = maxScale)
+  minScale <- attr(y,'minScale')
+  maxScale <- attr(y,'maxScale')
 
-  RF  <- dplyr::as_tibble(table(y))
+  RF <- as.list(table(y))
   return(RF)
 }
 
@@ -340,40 +408,47 @@ RF <- function(y){
 #' @rdname classicalRNG
 Coupon <- function(y, minScale = NA, maxScale = NA){
 
-  y <- check_y(y, minScale = minScale, maxScale = maxScale)
+  y        <- check_y(y, minScale = minScale, maxScale = maxScale)
   minScale <- attr(y,'minScale')
   maxScale <- attr(y,'maxScale')
 
-  cnt <- 0
   stp <- FALSE
-  cpn <- dplyr::tibble(x = vector(mode = "integer"))
+  cnt <- 0
+  cpn <- vector(mode = "integer")
 
-  while (stp == FALSE) {
-    cnt <- cnt + 1
-    cpn[[cnt,1]] <- first_occurence(y,minScale,maxScale)
-    y <- y[(cpn[[cnt,1]]+1):length(y)]
-    chk <- map_lgl(seq(minScale,maxScale), function(x) any(which(y == x)))
-    stp <- any(chk == FALSE)
-  }
+  if(all(purrr::map_lgl(seq(minScale, maxScale), function(x) any(which(y == x))))) {
+    while (stp == FALSE) {
+      cnt      <- cnt + 1
+      cpn[cnt] <- first_occurence(y, minScale, maxScale)
+      y        <- y[(cpn[cnt]+1):length(y)]
+      chk      <- purrr::map_lgl(seq(minScale, maxScale), function(x) any(which(y == x)))
+      stp      <- any(chk == FALSE)
+    }
+    Coupon     <- mean(cpn, na.rm = TRUE)
+    rm(y, cnt, stp, cpn, chk)
+  } else {
+      Coupon   <- NULL
+    }
 
-  Coupon <- mean(cpn$x, na.rm = TRUE)
-  rm(y, cnt, stp, cpn, chk)
+  attr(Coupon,'Name')     <- 'Coupon'
+  attr(Coupon,'y')        <- y
+  attr(Coupon,'minScale') <- minScale
+  attr(Coupon,'maxScale') <- maxScale
 
   return(Coupon)
 }
-
 
 # NSQ ---------------------------------------------------------------------
 
 #' NSQ
 #' @rdname classicalRNG
-NSQ <- function(y, minScale=NA, maxScale=NA){
+NSQ <- function(y, minScale = NA, maxScale = NA){
 
-  y <- check_y(y, minScale = minScale, maxScale = maxScale)
+  y        <- check_y(y, minScale = minScale, maxScale = maxScale)
   minScale <- attr(y,'minScale')
   maxScale <- attr(y,'maxScale')
 
-  o_e <- observed_expected(y, minScale = minScale, maxScale = maxScale, lag = 1)
+  o_e      <- observed_expected(y, minScale=minScale, maxScale=maxScale, lag = 1)
 
   combis   <- o_e$combis
   observed <- o_e$observed
@@ -384,178 +459,99 @@ NSQ <- function(y, minScale=NA, maxScale=NA){
   return(NSQ)
 }
 
-# First-Order difference --------------------------------------------------
-
 # Adjacency ---------------------------------------------------------------
-# uses objects from RNG/FOD to calculate
 
 #' Adjacency
 #' @rdname classicalRNG
-Adjacency <- function(y){
+Adjacency <- function(y, minScale=NA, maxScale=NA){
 
-  y <- check_y(y)
+  y    <- check_y(y, minScale = minScale, maxScale = maxScale)
 
-  FOD <- as_tibble(table(diff(y),dnn=c("FOD")))
-  Ad_a <- 100 * FOD$n[FOD$FOD == 1] / length(y)
-  Ad_d <- 100 * FOD$n[FOD$FOD == -1] / length(y)
-  Ad_c <- 100 * sum(FOD$n[FOD$FOD == 1],
-                    FOD$n[FOD$FOD == -1], na.rm = TRUE) / length(y)
+  FOD  <- as_tibble(table(diff(y), dnn=c("FOD")))
+  ascending  <- 100 * FOD$n[FOD$FOD == 1]  / length(y)
+  descending <- 100 * FOD$n[FOD$FOD == -1] / length(y)
+  combined   <- 100 * sum(FOD$n[FOD$FOD == 1], FOD$n[FOD$FOD == -1], na.rm = TRUE) / length(y)
 
-  return(list(Ad_a = Ad_a,
-              Ad_b = Ad_b,
-              Ad_c = Ad_c))
+  return(list(Adj_ascending  = ascending,
+              Adj_descending = descending,
+              Adj_combined   = combined))
 }
 
 # TPI ---------------------------------------------------------------------
-# TPI depends starting direction
-# may straddle in case of response repetitions (using <= and >=)
 
 #' TPI
 #' @rdname classicalRNG
-TPI <- function(y){
+TPI <- function(y, minScale = NA, maxScale = NA){
 
-  y <- check_y(y)
+  y <- check_y(y, minScale = minScale, maxScale = maxScale)
 
   ind      <- findTPIs(y)
   sIndices <- ind$sIndices
   eIndices <- ind$eIndices
 
-  TPIs <- length(sIndices) + length(eIndices)
+  TPIs     <- length(sIndices) + length(eIndices)
+  TPI      <- 100 * (TPIs) / (2/3 * (NROW(y) - 2))
 
-  TPI <- 100 * (TPIs) / (2/3 * (NROW(y) - 2))
   return(TPI)
 }
 
-
-# tmp<-import("/Users/fredhasselman/Documents/Projects/RNGproject/wouteR/temp.txt")
-
-# std <- if_else(y[2] < y[1], ">", "<")
-# TPf <- function(y, std) {
-#   switch(std,
-#          "<" = as_tibble(y[-1L] <= y[-length(y)]),
-#          ">" = as_tibble(y[-1L] >= y[-length(y)])
-#          ) %>%
-#   mutate(y = lead(.$value, n = 1L)) %>%
-#   mutate(z = abs(.$value - .$y))
-# }
-#
-# tpo <- TPf(y, std)
-# TPI = 100 * sum(tpo$z, na.rm = T) / (2/3 * (n - 2))
-#
-
-# TPs <- as_tibble(y[-1L] < y[-length(y)]) %>%
-#   mutate(y = lead(.$value, n = 1L)) %>%
-#   mutate(z = abs(.$value - .$y))
-
-#
-# # Phase length ------------------------------------------------------------
-# # uses objects from TPI to calculate
-# # excluding first and last run
+# Phase length ------------------------------------------------------------
 
 #' Phase Lengths
 #' @rdname classicalRNG
-PhL <- function(y){
-  y        <- check_y(y)
+PhL <- function(y, minScale = NA, maxScale = NA){
+
+  y        <- check_y(y, minScale = minScale, maxScale = maxScale)
+
   ind      <- findTPIs(y)
   sIndices <- ind$sIndices
   eIndices <- ind$eIndices
   PhL      <- c(eIndices-sIndices, sIndices[2:length(sIndices)]-eIndices[1:(length(eIndices)-1)])
+
   return(PhL)
 }
 
-# # TP at end of response repetitions instead of halfway!
-# PhL <- as_tibble(
-#   table(
-#     rle(
-#       tpo$value[head(which(tpo$value == T), 1):tail(which(tpo$value == T), 1)])
-#     )
-#   )
-#
-# PLi <- PhL %>%
-#   group_by(lengths) %>%
-#   summarise(PL_n = sum(n))
-#
-# }
-#
-# # Runs --------------------------------------------------------------------
-# # uses objects from Phase length to calculate
-# # repetitions are treated as breaks in sequences
-
+# Runs --------------------------------------------------------------------
 
 #' Runs
 #' @rdname classicalRNG
-Runs <- function(y){
-  phases <- PhL(y)
+Runs <- function(y, minScale = NA, maxScale = NA){
+
+  y        <- check_y(y, minScale = minScale, maxScale = maxScale)
+
+  phases   <- PhL(y)
+
   return(var(phases))
 }
-
-# Runs <- if_else(std == ">", var(PhL$n[PhL$values == T]),
-#                 var(PhL$n[PhL$values == F]))
-#
-
-
 
 # Repetition Distance -----------------------------------------------------
 
 #' Repetition Distance
 #' @rdname classicalRNG
-repDistance <- function(y, minScale = NA, maxscale = NA){
+repDistance <- function(y, minScale = NA, maxScale = NA){
 
   y   <- check_y(y, minScale = minScale, maxScale = maxScale)
   minScale <- attr(y,'minScale')
   maxScale <- attr(y,'maxScale')
 
 
-  tmp <- llply(minScale:maxScale,function(v) diff(which(y==v)))
+  tmp <- plyr::llply(minScale:maxScale,function(v) diff(which(y==v)))
   RD  <- table(unlist(tmp))
 
   return(RD)
 }
 
-
-#
-# Ry <- function(yr, rd_1) {
-#   x <- if_else(yr$values[1] == T & yr$values[length(yr$values)] == T, "both",
-#        if_else(yr$values[1] == T & yr$values[length(yr$values)] == F, "first",
-#        if_else(yr$values[1] == F & yr$values[length(yr$values)] == T, "last",
-#          "none")))
-#   switch(x,
-#          "both"  = rd_1,
-#          "first" = rd_1[1:(length(rd_1)-1)],
-#          "last"  = rd_1[2:(length(rd_1))],
-#          "none"  = rd_1[2:(length(rd_1)-1)]
-#   )
-# }
-#
-# rd_t <- list()
-# cnt <- 0
-#
-# for(i in seq_len(maxScale)) {
-#   cnt  <- cnt + 1
-#   yr  <- rle(y == i)
-#   rd_1 <- yr$lengths[yr$values == F] + 1
-#   rd_2 <- yr$lengths[yr$values == T & yr$lengths >= 2] - 1
-#   rd_t[[cnt]] <- as_tibble(c(Ry(yr, rd_1), rep.int(1, times = sum(rd_2))))
-#   rm(yr, rd_1, rd_2)
-# }
-#
-# RD  <- as_tibble(unlist(rd_t))
-# RDT <- as_tibble(table(RD$value))
-# rm(cnt, i, rd_t)
-
-
 # Repetition Gap ----------------------------------------------------------
-# uses Repetition Distance information to calculate
 
 #' Repetition Gap
 #' @rdname classicalRNG
 repGap <- function(y, minScale = NA, maxScale = NA){
 
-  y   <- check_y(y, minScale = minScale, maxScale = maxScale)
+  y        <- check_y(y, minScale = minScale, maxScale = maxScale)
   minScale <- attr(y,'minScale')
   maxScale <- attr(y,'maxScale')
 
-  tmp <- llply(minScale:maxScale,function(v) diff(which(y==v)))
+  tmp <- plyr::llply(minScale:maxScale, function(v) diff(which(y==v)))
   RD  <- table(unlist(tmp))
 
   RD_median <- stats::median(unlist(tmp))
@@ -569,15 +565,6 @@ repGap <- function(y, minScale = NA, maxScale = NA){
               RD_mode   = RD_mode))
 }
 
-# getmode <- function(x) {
-#  uniqx <- unique(x)
-#  uniqx[which.max(tabulate(match(x, uniqx)))]
-# }
-#
-# RDmean <- mean(RD$value, na.rm = T)
-# RDmed  <- median(RD$value, na.rm = T)
-# RDmode <- as.double(RDT$Var1[RDT$Var1%in%which(RDT$n == max(RDT$n))])
-
 # Phi index ---------------------------------------------------------------
 
 #' Phi Index
@@ -588,9 +575,9 @@ repGap <- function(y, minScale = NA, maxScale = NA){
 #' @rdname classicalRNG
 #' @export
 #'
-PhiIndex <- function(y, minScale = NA, maxScale = NA, responseAlternatives = NA, maxOrder = 7){
+phiIndex <- function(y, minScale = NA, maxScale = NA, responseAlternatives = NA, maxOrder = 7){
 
-  y <- check_y(y, minScale = minScale, maxScale = maxScale, responseAlternatives = responseAlternatives)
+  y        <- check_y(y, minScale = minScale, maxScale = maxScale, responseAlternatives = responseAlternatives)
   minIndex <- attr(y,"minScale")
   maxIndex <- attr(y,"maxScale")
   responseAlternatives <- attr(y,"responseAlternatives")
@@ -607,11 +594,10 @@ PhiIndex <- function(y, minScale = NA, maxScale = NA, responseAlternatives = NA,
   lookup <- data.frame(DescTools::CombSet(c(0,1),maxOrder,repl=TRUE, ord = TRUE),0)
   colnames(lookup) <- c(paste0("pos",1:maxOrder),"freq")
 
-  phiArrayList <- phiObsPredList <- phiObsFreqList <- phiList <- list()
-
-  PhiFreq <- data.frame(respIns = minIndex:maxIndex, freq = 0)
-  PhiFreq$freq <- plyr::laply(PhiFreq$respIns,function(n) sum(y==n, na.rm = TRUE))
-  PhiFreq$invFreq <-  Nresp-PhiFreq$freq
+  phiArrayList    <- phiObsPredList <- phiObsFreqList <- phiList <- list()
+  PhiFreq         <- data.frame(respIns = minIndex:maxIndex, freq = 0)
+  PhiFreq$freq    <- plyr::laply(PhiFreq$respIns,function(n) sum(y==n, na.rm = TRUE))
+  PhiFreq$invFreq <- Nresp-PhiFreq$freq
 
   for(A in 2:maxOrder){
     phiObsPred <- matrix(0,2,2, dimnames = list(c("obs","pred"),c("repeat","alternate")))
@@ -714,17 +700,3 @@ PhiIndex <- function(y, minScale = NA, maxScale = NA, responseAlternatives = NA,
 
   return(phiList)
 }
-
-# p <- 6
-#
-# for(i in seq_len(p)) {
-#   tmp <- as_tibble(y) %>% mutate(x = lead(y, n = 1)) %>%
-#     mutate(y = if_else(.$value == .$x, 0, 1))
-#   for(j in seq_len(maxScale)) {
-#     tmp <- tmp %>% mutate(z = if_else(.$value == j, 0, 1))
-#   }
-# }
-
-
-
-

@@ -14,42 +14,42 @@
 \alias{Runs}
 \alias{repDistance}
 \alias{repGap}
-\alias{PhiIndex}
+\alias{phiIndex}
 \title{Measures of the classical RNG task}
 \usage{
-Redundancy(y, maxScale = NA)
+Redundancy(y, minScale = NA, maxScale = NA)
 
 RNG(y, minScale = NA, maxScale = NA)
 
 RNG2(y, minScale = NA, maxScale = NA)
 
-RF(y)
+RF(y, minScale = NA, maxScale = NA)
 
 Coupon(y, minScale = NA, maxScale = NA)
 
 NSQ(y, minScale = NA, maxScale = NA)
 
-Adjacency(y)
+Adjacency(y, minScale = NA, maxScale = NA)
 
-TPI(y)
+TPI(y, minScale = NA, maxScale = NA)
 
-PhL(y)
+PhL(y, minScale = NA, maxScale = NA)
 
-Runs(y)
+Runs(y, minScale = NA, maxScale = NA)
 
-repDistance(y, minScale = NA, maxscale = NA)
+repDistance(y, minScale = NA, maxScale = NA)
 
 repGap(y, minScale = NA, maxScale = NA)
 
-PhiIndex(y, minScale = NA, maxScale = NA, responseAlternatives = NA,
+phiIndex(y, minScale = NA, maxScale = NA, responseAlternatives = NA,
   maxOrder = 7)
 }
 \arguments{
 \item{y}{A sequence of symbols. If \code{y} is non-numeric, unique elements will be labelled by an integer value.}
 
-\item{maxScale}{Maximum expected value. If \code{y} is a character vector this should refer to the highest numeric code used.}
-
 \item{minScale}{Minimum expected value. If \code{y} is a character vector this should refer to the lowest numeric code used.}
+
+\item{maxScale}{Maximum expected value. If \code{y} is a character vector this should refer to the highest numeric code used.}
 
 \item{responseAlternatives}{An optional vector of possible response alternatives. If \code{NA}, \code{responseAlternatives} will be set to \code{seq(minScale,maxScale)}}
 
@@ -59,7 +59,7 @@ PhiIndex(y, minScale = NA, maxScale = NA, responseAlternatives = NA,
 Output
 }
 \description{
-Individual funcations to get the measures of the classical RNG task. Use function \code{allRNG()} to get a list with all (or selected) measures.
+Individual functions to get the measures of the classical RNG task. Use function \code{allRNG()} to get a list with all (or selected) measures.
 }
 \examples{
 
