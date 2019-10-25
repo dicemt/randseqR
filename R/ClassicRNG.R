@@ -12,12 +12,13 @@
 findTPIs <- function(y){
 
   y <- casnet::ts_symbolic(y, usePlateaus = TRUE)
-  startWith <- which.min(c(which(y %in% c("peak"))[1],which(y %in% c("trough"))[1]))
+  #startWith <- which.min(c(which(y %in% c("peak"))[1],which(y %in% c("trough"))[1]))
+  startWith <- which.min(c(which(y == 5)[1],which(y == 1)[1]))
 
-  yPeak   <- y %in% c("peak")
-  yTrough <- y %in% c("trough")
+  yPeak   <- y == 5 # %in% c("peak")
+  yTrough <- y == 1 # %in% c("trough")
 
-  sIndices <- list(which(yPeak[1:NROW(y)] - yPeak[2:(NROW(y)-1)]>0), which(yTrough[1:(NROW(y)-1)] - yTrough[2:NROW(y)]>0))[[startWith]]
+  sIndices <- list(which(yPeak[1:(NROW(y)-1)] - yPeak[2:NROW(y)]>0), which(yTrough[1:(NROW(y)-1)] - yTrough[2:NROW(y)]>0))[[startWith]]
   eIndices <- list(which(yPeak[1:(NROW(y)-1)] - yPeak[2:NROW(y)]>0), which(yTrough[1:(NROW(y)-1)] - yTrough[2:NROW(y)]>0))[[-startWith]]
 
   return(list(sIndices = sIndices,
