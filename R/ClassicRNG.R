@@ -12,12 +12,14 @@
 findTPIs <- function(y){
 
   y <- casnet::ts_symbolic(y, usePlateaus = TRUE)
+  y <- attr(y,"sym_numeric")
   startWith <- which.min(c(which(y == 5)[1], which(y == 1)[1]))
-#  startWith <- which.min(c(which(y %in% c("peak")[1]), which(y %in% c("trough")[1])))
-
+  #startWith <- which.min(c(which(y %in% c("peak")[1]), which(y %in% c("trough")[1])))
 
   yPeak   <- y == 5 # %in% c("peak")
+  names(yPeak) <- paste0(1:length(yPeak),"peak")
   yTrough <- y == 1 # %in% c("trough")
+  names(yTrough) <- paste0(1:length(yTrough),"trough")
   ind     <- list(which(yPeak[1:(NROW(y)-1)] - yPeak[2:NROW(y)]>0), which(yTrough[1:(NROW(y)-1)] - yTrough[2:NROW(y)]>0))
 
   return(list(sIndices = ind[[startWith]],
@@ -38,8 +40,8 @@ findTPIs <- function(y){
 #'
 #' @examples
 #'
-#' y <- letters
-#' check_y(y)
+#' y <- sample(letters,10)
+#' check_y(y, responseAlternatives=letters)
 #'
 check_y <- function(y, minScale=NA, maxScale=NA, responseAlternatives = NA,
                     noZero = FALSE, toNumeric = TRUE){
@@ -66,7 +68,7 @@ check_y <- function(y, minScale=NA, maxScale=NA, responseAlternatives = NA,
 
 
   if(any(is.na(minScale), is.na(maxScale))){
-    minScale <- responseAlternatives[1]
+    minScale <- as.numeric(responseAlternatives[1])
     maxScale <- max(responseAlternatives, na.rm = TRUE)
   }
 
@@ -309,6 +311,7 @@ allRNG <- function(y,
 #'
 #' @seealso [allRNG()] to get *all*, or, a selected list of measures.
 #'
+#' @export
 #' @examples
 #'
 #' y <- round(runif(100,1,9))
@@ -341,8 +344,9 @@ Redundancy <- function(y, minScale = NA, maxScale = NA){
 # RNG ---------------------------------------------------------------------
 
 #' RNG
+#' @export
 #' @rdname classicalRNG
-RNG <- function(y, minScale = NA, maxScale = NA){
+RNG <- function(y, minScale = NA, maxScale = NA, results = c("classical","randseqR")[2]){
 
   y        <- check_y(y, minScale = minScale, maxScale = maxScale)
   minScale <- attr(y,'minScale')
@@ -352,7 +356,12 @@ RNG <- function(y, minScale = NA, maxScale = NA){
   o_e      <- observed_expected(y, minScale = minScale, maxScale = maxScale, lag = 1)
 
   combis   <- o_e$combis
-  observed <- c(o_e$observed, paste0(dplyr::last(y),".",dplyr::first(y)))
+
+  if(results == "randseqR"){
+    observed <- c(o_e$observed)
+  } else {
+    observed <- c(o_e$observed, paste0(dplyr::last(y),".",dplyr::first(y)))
+  }
 
   Afreq <- table(y)
   freqs <- purrr::map_dfr(combis, function(c) {data.frame(pair=c, freq=sum(observed%in%c))})
@@ -360,6 +369,8 @@ RNG <- function(y, minScale = NA, maxScale = NA){
 
   attr(RNG,'Name')     <- 'RNG'
   attr(RNG,'y')        <- y
+  attr(RNG,'results')  <- results
+
 #  attr(RNG,'minScale') <- minScale
 #  attr(RNG,'maxScale') <- maxScale
 
@@ -586,8 +597,13 @@ Runs <- function(y, minScale = NA, maxScale = NA){
 #    phases <- phases[! phases%in%0]
 #  }
 
+if(any(grepl("trough",names(ind$sIndices)))){
+  v <- var(phases[phases>0],na.rm = TRUE)
+} else {
+  v <- var(phases[phases<0],na.rm = TRUE)
+}
 
-  return(var(phases, na.rm = TRUE))
+  return(v)
 }
 
 # Repetition Distance -----------------------------------------------------
