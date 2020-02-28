@@ -4,8 +4,14 @@
 \alias{check_y}
 \title{Check vector}
 \usage{
-check_y(y, minScale = NA, maxScale = NA, noZero = FALSE,
-  toNumeric = TRUE, responseAlternatives = NA)
+check_y(
+  y,
+  minScale = NA,
+  maxScale = NA,
+  responseAlternatives = NA,
+  noZero = FALSE,
+  toNumeric = TRUE
+)
 }
 \arguments{
 \item{y}{A vector. If not a numeric vector and \code{toNumeric = TRUE}, unique elements will be labelled by an integer value.}
@@ -14,11 +20,11 @@ check_y(y, minScale = NA, maxScale = NA, noZero = FALSE,
 
 \item{maxScale}{Maximum expected value. If \code{y} is a character vector this should refer to the highest numeric code used.}
 
+\item{responseAlternatives}{An optional vector of possible response alternatives. If \code{NA}, \code{responseAlternatives} will be set to \code{seq(minScale,maxScale)}}
+
 \item{noZero}{Can the series have value \code{0}?}
 
 \item{toNumeric}{If \code{TRUE}, the unique elements in a non-numeric vector will be labelled by an integer value.}
-
-\item{responseAlternatives}{An optional vector of possible response alternatives. If \code{NA}, \code{responseAlternatives} will be set to \code{seq(minScale,maxScale)}}
 }
 \value{
 Trasformed \code{y} (if necessary), or, an error message.

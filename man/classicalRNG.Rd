@@ -41,8 +41,13 @@ repDistance(y, minScale = NA, maxScale = NA)
 
 repGap(y, minScale = NA, maxScale = NA)
 
-phiIndex(y, minScale = NA, maxScale = NA, responseAlternatives = NA,
-  maxOrder = 7)
+phiIndex(
+  y,
+  minScale = NA,
+  maxScale = NA,
+  responseAlternatives = NA,
+  maxOrder = 7
+)
 }
 \arguments{
 \item{y}{A sequence of symbols. If \code{y} is non-numeric, unique elements will be labelled by an integer value.}

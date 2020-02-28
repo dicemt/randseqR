@@ -4,7 +4,7 @@
 \alias{observed_expected}
 \title{Observed and expected combination pairs}
 \usage{
-observed_expected(y, minScale, maxScale, lag = 1)
+observed_expected(y, minScale, maxScale, lag)
 }
 \arguments{
 \item{y}{Numeric vector}

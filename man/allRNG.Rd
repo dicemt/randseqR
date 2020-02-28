@@ -4,10 +4,26 @@
 \alias{allRNG}
 \title{Get all classical RNG measures}
 \usage{
-allRNG(y, minScale = NA, maxScale = NA, responseAlternatives = NA,
-  R = TRUE, RNG = TRUE, RNG2 = TRUE, RF = TRUE, Coupon = TRUE,
-  NSQ = TRUE, Adjacency = TRUE, TPI = TRUE, PhL = TRUE,
-  Runs = TRUE, repDistance = TRUE, repGap = TRUE, Phi = TRUE)
+allRNG(
+  y,
+  minScale = NA,
+  maxScale = NA,
+  responseAlternatives = NA,
+  R = TRUE,
+  RNG = TRUE,
+  RNG2 = TRUE,
+  RF = TRUE,
+  Coupon = TRUE,
+  NSQ = TRUE,
+  FOD = TRUE,
+  Adjacency = TRUE,
+  TPI = TRUE,
+  PhL = TRUE,
+  Runs = TRUE,
+  repDistance = TRUE,
+  repGap = TRUE,
+  Phi = TRUE
+)
 }
 \arguments{
 \item{y}{A sequence of symbols. If \code{y} is non-numeric, unique elements will be labelled by an integer value.}
