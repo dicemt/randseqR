@@ -1,6 +1,105 @@
 
 # HELPERS ----
 
+#' Find peaks/troughs
+#'
+#' @param y Numeric vector
+#'
+#' @return converted y with values 1 (trough); 2 (decrease); 3 (same); 5 (increase); 5 (peak)
+#'
+#' @export
+#'
+TPIhelper <- function(y){
+
+  TT <- length(y)
+  su <- vector(mode = "numeric", length = length(y))
+  su[1] <- NA
+
+  # sym_num conversion ------------------------------------------------------
+  for (t in 2:(TT)) {
+    if(t != TT) {
+      if (y[t] == y[t - 1] | y[t] == y[t + 1]) {
+        su[t] <- 3
+      }
+      if (y[t] > y[t - 1]) {
+        if (y[t] > y[t + 1]) {
+          su[t] <- 5
+        }
+        else {
+          su[t] <- 4
+        }
+      }
+      if (y[t] < y[t - 1]) {
+        if (y[t] < y[t + 1]) {
+          su[t] <- 1
+        }
+        else {
+          su[t] <- 2
+        }
+      }
+    }
+    else {
+      if (y[t - 1] > y[t]) {
+        su[t] <- 2
+      }
+      if (y[t - 1] < y[t]) {
+        su[t] <- 4
+      }
+      if (y[t - 1] == y[t]) {
+        su[t] <- 3
+      }
+    }
+  }
+
+  # sym_label conversion with plateaus -------------------------------------
+  sa <- dplyr::case_when(su == 1 ~ "trough", su == 2 ~ "decrease", su == 3 ~ "same",
+                         su == 4 ~ "increase", su == 5 ~ "peak", is.na(su) ~ NA_character_)
+
+  ou   <- su
+  oa   <- sa
+  i    <- 1
+  same <- 0
+
+  while (i <= length(sa)) {
+    if (sa[i] %in% c("increase", "decrease")) {
+      samesame <- TRUE
+      r <- i + 1
+      same <- 0
+      while (samesame) {
+        if (sa[r] %in% "same") {
+          same <- same + 1
+          r <- r + 1
+        }
+        else {
+          samesame <- FALSE
+        }
+      }
+      if (same > 0) {
+        if (all(!sa[i] %in% c("increase"), sa[i + same + 1] %in% c("peak", "increase"))) {
+          oa[i:(i + same)] <- "trough"
+          ou[i:(i + same)] <- 1
+        }
+        else {
+          if (all(!sa[i] %in% c("decrease"), sa[i + same + 1] %in% c("trough", "decrease"))) {
+            oa[i:(i + same)] <- "peak"
+            ou[i:(i + same)] <- 5
+          }
+        }
+      }
+    }
+    if (same > 0) {
+      i <- (i + same)
+      same <- 0
+    }
+    else {
+      i <- i + 1
+    }
+  }
+
+  return(ou)
+
+}
+
 #' Find turning points
 #'
 #' @param y Numeric vector.
@@ -11,14 +110,20 @@
 #'
 findTPIs <- function(y){
 
-  y <- casnet::ts_symbolic(y, usePlateaus = TRUE)
-  startWith <- which.min(c(which(y == 5)[1], which(y == 1)[1]))
-#  startWith <- which.min(c(which(y %in% c("peak")[1]), which(y %in% c("trough")[1])))
+  # y <- casnet::ts_symbolic(y, usePlateaus = TRUE)
+  # y <- attr(y, "sym_numeric")
 
+  z <- TPIhelper(y)
 
-  yPeak   <- y == 5 # %in% c("peak")
-  yTrough <- y == 1 # %in% c("trough")
-  ind     <- list(which(yPeak[1:(NROW(y)-1)] - yPeak[2:NROW(y)]>0), which(yTrough[1:(NROW(y)-1)] - yTrough[2:NROW(y)]>0))
+  startWith <- which.min(c(which(z == 5)[1], which(z == 1)[1]))
+  # startWith <- which.min(c(which(y %in% c("peak")[1]), which(y %in% c("trough")[1])))
+
+  yPeak          <- z == 5 # %in% c("peak")
+  yTrough        <- z == 1 # %in% c("trough")
+  # names(yPeak)   <- paste0(1:length(yPeak), "peak")
+  # names(yTrough) <- paste0(1:length(yTrough), "trough")
+  ind            <- list(which(yPeak[1:(NROW(y)-1)] - yPeak[2:NROW(y)]>0),
+                          which(yTrough[1:(NROW(y)-1)] - yTrough[2:NROW(y)]>0))
 
   return(list(sIndices = ind[[startWith]],
               eIndices = ind[[-startWith]]))
@@ -32,9 +137,7 @@ findTPIs <- function(y){
 #' @param noZero Can the series have value `0`?
 #' @param toNumeric If `TRUE`, the unique elements in a non-numeric vector will be labelled by an integer value.
 #'
-#' @return Trasformed `y` (if necessary), or, an error message.
-#'
-#' @export
+#' @return Transformed `y` (if necessary), or, an error message.
 #'
 #' @examples
 #'
@@ -66,7 +169,7 @@ check_y <- function(y, minScale=NA, maxScale=NA, responseAlternatives = NA,
 
 
   if(any(is.na(minScale), is.na(maxScale))){
-    minScale <- responseAlternatives[1]
+    minScale <- as.numeric(responseAlternatives[1])
     maxScale <- max(responseAlternatives, na.rm = TRUE)
   }
 
@@ -156,9 +259,10 @@ observed_expected <- function(y, minScale, maxScale, lag){
 
   #observed <- paste(interaction(y, dplyr::lead(y, 1, default = y[1])))
 
-  return(list(combis   = combis,
-              observed = observed))
+  return(list(combis   = as.numeric(combis),
+              observed = as.numeric(observed)))
 }
+
 
 #' Get all classical RNG measures
 #'
@@ -166,6 +270,7 @@ observed_expected <- function(y, minScale, maxScale, lag){
 #' @param minScale Minimum expected value. If `y` is a character vector this should refer to the lowest numeric code used.
 #' @param maxScale Maximum expected value. If `y` is a character vector this should refer to the highest numeric code used.
 #' @param responseAlternatives An optional vector of possible response alternatives. If `NA`, `responseAlternatives` will be set to `seq(minScale,maxScale)`
+#' @param results Either 'randseqR' (default) or 'classical'.
 #' @param R Redundancy (default = `TRUE`)
 #' @param RNG RNG (default = `TRUE`)
 #' @param RNG2 RNG2 (default = `TRUE`)
@@ -192,10 +297,11 @@ observed_expected <- function(y, minScale, maxScale, lag){
 #' allRNG(y, minScale = 1, maxScale = 9, RF = FALSE)
 #'
 allRNG <- function(y,
-                   minScale=NA,
-                   maxScale=NA,
+                   minScale = NA,
+                   maxScale = NA,
                    responseAlternatives = NA,
-                   R           = TRUE,
+                   results = c("classical", "randseqR")[2],
+                   Redundancy  = TRUE,
                    RNG         = TRUE,
                    RNG2        = TRUE,
                    RF          = TRUE,
@@ -208,7 +314,7 @@ allRNG <- function(y,
                    Runs        = TRUE,
                    repDistance = TRUE,
                    repGap      = TRUE,
-                   Phi         = TRUE
+                   PhiIndex    = TRUE
                    ){
 
 #disp('not implemented yet')
@@ -217,16 +323,16 @@ allRNG <- function(y,
   maxScale <- attr(y,"maxScale")
   responseAlternatives <- attr(y,"responseAlternatives")
 
-  if(R){
+  if(Redundancy){
     Redundancy <- Redundancy(y = y, minScale = minScale, maxScale = maxScale)
   }
 
   if(RNG){
-    RNG <- RNG(y = y, minScale = minScale, maxScale = maxScale)
+    RNG <- RNG(y = y, minScale = minScale, maxScale = maxScale, results = results)
   }
 
   if(RNG2){
-    RNG2 <- RNG2(y = y, minScale = minScale, maxScale = maxScale)
+    RNG2 <- RNG2(y = y, minScale = minScale, maxScale = maxScale, results = results)
   }
 
   if(RF){
@@ -238,15 +344,16 @@ allRNG <- function(y,
   }
 
   if(NSQ){
-    NSQ <- NSQ(y = y, minScale = minScale, maxScale = maxScale)
+    NSQ <- NSQ(y = y, minScale = minScale, maxScale = maxScale, results = results)
   }
 
   if(FOD){
-    FOD <- FOD(y = y, minScale = minScale, maxScale = maxScale)
+    FOD <- FOD(y = y, minScale = minScale, maxScale = maxScale, results = results)
   }
 
   if(Adjacency){
-    Adjacency <- Adjacency(y = y, minScale = minScale, maxScale = maxScale)
+    Adjacency <- Adjacency(y = y, minScale = minScale, maxScale = maxScale,
+                           results = results)
   }
 
   if(TPI){
@@ -258,7 +365,7 @@ allRNG <- function(y,
   }
 
   if(Runs){
-    Runs <- Runs(y = y, minScale = minScale, maxScale = maxScale)
+    Runs <- Runs(y = y, minScale = minScale, maxScale = maxScale, results = results)
   }
 
   if(repDistance){
@@ -269,11 +376,13 @@ allRNG <- function(y,
     repGap <- repGap(y = y, minScale = minScale, maxScale = maxScale)
   }
 
-  if(Phi){
+  if(PhiIndex){
     phiIndex <- phiIndex(y = y, minScale = minScale, maxScale = maxScale)
   }
 
-  out <- list("Reduncany"   = Redundancy,
+  out <- list("Results"     = results,
+              "N"           = length(y),
+              "Redundancy"  = Redundancy,
               "RNG"         = RNG,
               "RNG2"        = RNG2,
               "RF"          = RF,
@@ -285,10 +394,8 @@ allRNG <- function(y,
               "phaselength" = PhL,
               "Runs"        = Runs,
               "repDistance" = repDistance,
-              "RD_median"   = repGap$RD_median,
-              "RD_mean"     = repGap$RD_mean,
-              "RD_mode"     = repGap$RD_mode,
-              "Phi_index"   = phiIndex
+              "repGap"      = repGap,
+              "PhiIndex"    = phiIndex
               )
 
   return(out)
@@ -302,6 +409,7 @@ allRNG <- function(y,
 #' @param y A sequence of symbols. If `y` is non-numeric, unique elements will be labelled by an integer value.
 #' @param minScale Minimum expected value. If `y` is a character vector this should refer to the lowest numeric code used.
 #' @param maxScale Maximum expected value. If `y` is a character vector this should refer to the highest numeric code used.
+#' @param results either 'randseqR' (default) or 'classical. randseqR gives a better consistency among RNG measures, while classical gives output comparible to RGcalc by Towse and Neil (1998)
 #'
 #' @name classicalRNG
 #'
@@ -321,7 +429,12 @@ NULL
 
 
 #' Redundancy
+#'
+#' @inheritParams allRNG
+#'
 #' @rdname classicalRNG
+#' @export
+#'
 Redundancy <- function(y, minScale = NA, maxScale = NA){
 
   y        <- check_y(y, minScale = minScale, maxScale = maxScale)
@@ -333,7 +446,6 @@ Redundancy <- function(y, minScale = NA, maxScale = NA){
 
   attr(R,'Name')     <- 'Redundancy'
   attr(R,'y')        <- y
-#  attr(R,'maxScale') <- maxScale
 
   return(R)
 }
@@ -341,8 +453,14 @@ Redundancy <- function(y, minScale = NA, maxScale = NA){
 # RNG ---------------------------------------------------------------------
 
 #' RNG
+#'
+#' @inheritParams allRNG
+#'
 #' @rdname classicalRNG
-RNG <- function(y, minScale = NA, maxScale = NA){
+#' @export
+#'
+RNG <- function(y, minScale = NA, maxScale = NA,
+                results = c("classical", "randseqR")[2]){
 
   y        <- check_y(y, minScale = minScale, maxScale = maxScale)
   minScale <- attr(y,'minScale')
@@ -350,18 +468,23 @@ RNG <- function(y, minScale = NA, maxScale = NA){
   responseAlternatives <- attr(y,"responseAlternatives")
 
   o_e      <- observed_expected(y, minScale = minScale, maxScale = maxScale, lag = 1)
-
   combis   <- o_e$combis
-  observed <- c(o_e$observed, paste0(dplyr::last(y),".",dplyr::first(y)))
 
-  Afreq <- table(y)
-  freqs <- purrr::map_dfr(combis, function(c) {data.frame(pair=c, freq=sum(observed%in%c))})
-  RNG   <- sum(freqs$freq * log(freqs$freq),na.rm = TRUE) / sum(Afreq*log(Afreq), na.rm = TRUE)
+  if(results == "randseqR") {
+    observed <- c(o_e$observed)
+    Afreq <- table(y)
+    freqs <- purrr::map_dfr(combis, function(c) {data.frame(pair=c, freq=sum(observed%in%c))})
+    RNG   <- 100 * sum(freqs$freq * log(freqs$freq),na.rm = TRUE) / sum(Afreq*log(Afreq), na.rm = TRUE)
+  } else {
+    observed <- c(o_e$observed, paste0(dplyr::last(y),".",dplyr::first(y)))
+    Afreq <- table(y)
+    freqs <- purrr::map_dfr(combis, function(c) {data.frame(pair=c, freq=sum(observed%in%c))})
+    RNG   <- sum(freqs$freq * log(freqs$freq),na.rm = TRUE) / sum(Afreq*log(Afreq), na.rm = TRUE)
+  }
 
   attr(RNG,'Name')     <- 'RNG'
   attr(RNG,'y')        <- y
-#  attr(RNG,'minScale') <- minScale
-#  attr(RNG,'maxScale') <- maxScale
+  attr(RNG, 'results') <- results
 
   return(RNG)
 }
@@ -369,8 +492,14 @@ RNG <- function(y, minScale = NA, maxScale = NA){
 # RNG2 --------------------------------------------------------------------
 
 #' RNG2
+#'
+#' @inheritParams allRNG
+#'
 #' @rdname classicalRNG
-RNG2 <- function(y, minScale = NA, maxScale = NA){
+#' @export
+#'
+RNG2 <- function(y, minScale = NA, maxScale = NA,
+                 results = c("classical", "randseqR")[2]){
 
   y        <- check_y(y, minScale = minScale, maxScale = maxScale)
   minScale <- attr(y,'minScale')
@@ -384,12 +513,16 @@ RNG2 <- function(y, minScale = NA, maxScale = NA){
 
   Afreq <- table(y)
   freqs <- purrr::map_dfr(combis, function(c) {data.frame(pair=c,freq=sum(observed%in%c))})
-  RNG2  <- sum(freqs$freq * log(freqs$freq),na.rm = TRUE) / sum(Afreq*log(Afreq), na.rm = TRUE)
+
+  if(results == "randseqR") {
+    RNG2  <- 100 * sum(freqs$freq * log(freqs$freq),na.rm = TRUE) / sum(Afreq*log(Afreq), na.rm = TRUE)
+  } else {
+    RNG2  <- sum(freqs$freq * log(freqs$freq),na.rm = TRUE) / sum(Afreq*log(Afreq), na.rm = TRUE)
+  }
 
   attr(RNG2,'Name')     <- 'RNG2'
   attr(RNG2,'y')        <- y
-#  attr(RNG2,'minScale') <- minScale
-#  attr(RNG2,'maxScale') <- maxScale
+  attr(RNG2, 'results') <- results
 
   return(RNG2)
 }
@@ -397,7 +530,12 @@ RNG2 <- function(y, minScale = NA, maxScale = NA){
 # Response frequencies ----------------------------------------------------
 
 #' RF
+#'
+#' @inheritParams allRNG
+#'
 #' @rdname classicalRNG
+#' @export
+#'
 RF <- function(y, minScale = NA, maxScale = NA){
 
   y        <- check_y(y, minScale = minScale, maxScale = maxScale)
@@ -405,15 +543,24 @@ RF <- function(y, minScale = NA, maxScale = NA){
   maxScale <- attr(y,'maxScale')
   responseAlternatives <- attr(y,"responseAlternatives")
 
-  RF <- as.list(table(y))
+  RFList        <- as.list(table(y))
+  names(RFList) <- c(paste0("RF_", minScale:maxScale))
 
-  return(RF)
+  attr(RFList, 'Name') <- 'RF'
+  attr(RFList, 'y')    <- y
+
+  return(RFList)
 }
 
 # Coupon ------------------------------------------------------------------
 
 #' Coupon
+#'
+#' @inheritParams allRNG
+#'
 #' @rdname classicalRNG
+#' @export
+#'
 Coupon <- function(y, minScale = NA, maxScale = NA){
 
   y        <- check_y(y, minScale = minScale, maxScale = maxScale)
@@ -424,25 +571,24 @@ Coupon <- function(y, minScale = NA, maxScale = NA){
   stp <- FALSE
   cnt <- 0
   cpn <- vector(mode = "integer")
+  tmp <- y
 
   if(all(purrr::map_lgl(responseAlternatives, function(x) any(which(y == x))))) {
     while (stp == FALSE) {
       cnt      <- cnt + 1
-      cpn[cnt] <- first_occurence(y, minScale, maxScale)
-      y        <- y[(cpn[cnt]+1):length(y)]
-      chk      <- purrr::map_lgl(responseAlternatives, function(x) any(which(y == x)))
+      cpn[cnt] <- first_occurence(tmp, minScale, maxScale)
+      tmp      <- tmp[(cpn[cnt]+1):length(tmp)]
+      chk      <- purrr::map_lgl(responseAlternatives, function(x) any(which(tmp == x)))
       stp      <- any(chk == FALSE)
     }
     Coupon     <- mean(cpn, na.rm = TRUE)
-    rm(y, cnt, stp, cpn, chk)
+    rm(tmp, cnt, stp, cpn, chk)
   } else {
       Coupon   <- NaN
     }
 
   attr(Coupon,'Name')     <- 'Coupon'
-#  attr(Coupon,'y')        <- y
-  attr(Coupon,'minScale') <- minScale
-  attr(Coupon,'maxScale') <- maxScale
+  attr(Coupon,'y')        <- y
 
   return(Coupon)
 }
@@ -450,8 +596,14 @@ Coupon <- function(y, minScale = NA, maxScale = NA){
 # NSQ ---------------------------------------------------------------------
 
 #' NSQ
+#'
+#' @inheritParams allRNG
+#'
 #' @rdname classicalRNG
-NSQ <- function(y, minScale = NA, maxScale = NA){
+#' @export
+#'
+NSQ <- function(y, minScale = NA, maxScale = NA,
+                results = c("classical", "randseqR")[2]){
 
   y        <- check_y(y, minScale = minScale, maxScale = maxScale)
   minScale <- attr(y,'minScale')
@@ -461,10 +613,19 @@ NSQ <- function(y, minScale = NA, maxScale = NA){
   o_e      <- observed_expected(y, minScale=minScale, maxScale=maxScale, lag = 1)
 
   combis   <- o_e$combis
-  observed <- o_e$observed
+
+  if(results == "randseqR"){
+    observed <- o_e$observed
+  } else {
+    observed <- c(o_e$observed, paste0(dplyr::last(y),".",dplyr::first(y)))
+  }
 
   NS  <- length(combis)-length(unique(observed))
   NSQ <- 100 * (NS / (maxScale^2 - 1))
+
+  attr(NSQ,'Name')     <- 'NSQ'
+  attr(NSQ,'y')        <- y
+  attr(NSQ, 'results') <- results
 
   return(NSQ)
 }
@@ -472,32 +633,69 @@ NSQ <- function(y, minScale = NA, maxScale = NA){
 
 # First-order difference --------------------------------------------------
 
-FOD <- function(y, minScale=NA, maxScale=NA) {
+#' First-order difference
+#'
+#' @inheritParams allRNG
+#'
+#' @rdname classicalRNG
+#' @export
+#'
+FOD <- function(y, minScale = NA, maxScale = NA,
+                results = c("classical", "randseqR")[2]) {
 
   y        <- check_y(y, minScale = minScale, maxScale = maxScale)
   minScale <- attr(y,'minScale')
   maxScale <- attr(y,'maxScale')
 
-  FOD  <- table(c(diff(y), dplyr::first(y) - dplyr::last(y)))
-  return(FOD)
+  if(results == "randseqR") {
+    FOD            <- table(diff(y))
+    FODList        <- as.list(FOD)
+    names(FODList) <- c(paste0("Diff_", names(FOD)))
+  } else {
+    FOD            <- table(c(diff(y), dplyr::first(y) - dplyr::last(y)))
+    FODList        <- as.list(FOD)
+    names(FODList) <- c(paste0("Diff_", names(FOD)))
+  }
+
+
+  attr(FODList, 'Name')     <- 'FOD'
+  attr(FODList, 'y')        <- y
+  attr(FODList, 'results')  <- results
+
+  return(FODList)
 }
 
 # Adjacency ---------------------------------------------------------------
 
 #' Adjacency
+#'
+#' @inheritParams allRNG
+#'
 #' @rdname classicalRNG
-Adjacency <- function(y, minScale=NA, maxScale=NA){
+#' @export
+#'
+Adjacency <- function(y, minScale = NA, maxScale = NA,
+                      results = c("classical", "randseqR")[2]){
 
   y        <- check_y(y, minScale = minScale, maxScale = maxScale)
   minScale <- attr(y,'minScale')
   maxScale <- attr(y,'maxScale')
   responseAlternatives <- attr(y,"responseAlternatives")
 
-  FOD  <- table(c(diff(y), dplyr::first(y) - dplyr::last(y)))
+  if(results == "randseqR") {
+    FOD <- table(diff(y))
+  } else {
+    FOD <- table(c(diff(y), dplyr::first(y) - dplyr::last(y)))
+  }
+
   if(any(diff(y) ==  1)) {ascending  <- 100 * FOD[["1"]]  / length(y)} else {ascending <- 0}
   if(any(diff(y) == -1)) {descending <- 100 * FOD[["-1"]] / length(y)} else {descending <- 0}
 #  combined   <- 100 * sum(FOD[["1"]], FOD[["-1"]], na.rm = TRUE) / length(y)
   combined <- sum(ascending, descending)
+
+  attr(Adjacency,'Name')     <- 'Adjacency'
+  attr(Adjacency,'y')        <- y
+  attr(Adjacency, 'results') <- results
 
   return(list(Ascending  = ascending,
               Descending = descending,
@@ -507,7 +705,12 @@ Adjacency <- function(y, minScale=NA, maxScale=NA){
 # TPI ---------------------------------------------------------------------
 
 #' TPI
+#'
+#' @inheritParams allRNG
+#'
 #' @rdname classicalRNG
+#' @export
+#'
 TPI <- function(y, minScale = NA, maxScale = NA){
 
   y <- check_y(y, minScale = minScale, maxScale = maxScale)
@@ -521,6 +724,9 @@ TPI <- function(y, minScale = NA, maxScale = NA){
 
   TPIs     <- length(sIndices) + length(eIndices)
   TPI      <- 100 * (TPIs) / (2/3 * (NROW(y) - 2))
+
+  attr(TPI,'Name') <- 'TPI'
+  attr(TPI,'y')    <- y
 
   return(TPI)
 }
@@ -542,25 +748,38 @@ PhL <- function(y, minScale = NA, maxScale = NA){
   responseAlternatives <- attr(y,"responseAlternatives")
 
   ind     <- findTPIs(y)
-  if(diff(lengths(ind))) {
-    idMax <- which.max(c(length(ind$sIndices), length(ind$eIndices)))
-    idMin <- which.min(c(length(ind$sIndices), length(ind$eIndices)))
+  if(diff(lengths(ind)) == 0) {
+    PhL <- c(ind$eIndices-ind$sIndices, ind$sIndices[2:length(ind$sIndices)]-ind$eIndices[1:(length(ind$eIndices)-1)])
+    PhL <- table(PhL)
+  } else {
+    idMax        <- which.max(c(length(ind$sIndices), length(ind$eIndices)))
+    idMin        <- which.min(c(length(ind$sIndices), length(ind$eIndices)))
     ind[[idMin]] <- c(ind[[idMin]], ind[[idMax]][length(ind[[idMax]])])
+
+    PhL <- c(ind$eIndices-ind$sIndices, ind$sIndices[2:length(ind$sIndices)]-ind$eIndices[1:(length(ind$eIndices)-1)])
+    PhL <- table(PhL[! PhL%in%0])
   }
 
-  PhL <- c(ind$eIndices-ind$sIndices,
-           ind$sIndices[2:length(ind$sIndices)]-ind$eIndices[1:(length(ind$eIndices)-1)])
-  PhL <- table(PhL[! PhL%in%0])
+  PhLList        <- as.list(PhL)
+  names(PhLList) <- c(paste0("PhL_", names(PhL)))
 
-  return(PhL)
+  attr(PhLList,'Name') <- 'PhL'
+  attr(PhLList,'y')    <- y
+
+  return(PhLList)
 }
 
 # Runs --------------------------------------------------------------------
-# Add a RNG or Classic as an option
 
 #' Runs
+#'
+#' @inheritParams allRNG
+#'
 #' @rdname classicalRNG
-Runs <- function(y, minScale = NA, maxScale = NA){
+#' @export
+#'
+Runs <- function(y, minScale = NA, maxScale = NA,
+                 results = c("classical", "randseqR")[2]){
 
   y        <- check_y(y, minScale = minScale, maxScale = maxScale)
   minScale <- attr(y,'minScale')
@@ -568,32 +787,40 @@ Runs <- function(y, minScale = NA, maxScale = NA){
   responseAlternatives <- attr(y,"responseAlternatives")
 
   ind     <- findTPIs(y)
-  if(diff(lengths(ind))) {
-    idMax <- which.max(c(length(ind$sIndices), length(ind$eIndices)))
-    idMin <- which.min(c(length(ind$sIndices), length(ind$eIndices)))
-    ind[[idMin]] <- c(ind[[idMin]], ind[[idMax]][length(ind[[idMax]])])
-  }
+  if(results == "randseqR") {
+    if(diff(lengths(ind)) == 0) {
+      R    <- c(ind$eIndices-ind$sIndices, ind$sIndices[2:length(ind$sIndices)]-ind$eIndices[1:(length(ind$eIndices)-1)])
+      Runs <- var(R, na.rm = TRUE)
+      } else {
+        idMax        <- which.max(c(length(ind$sIndices), length(ind$eIndices)))
+        idMin        <- which.min(c(length(ind$sIndices), length(ind$eIndices)))
+        ind[[idMin]] <- c(ind[[idMin]], ind[[idMax]][length(ind[[idMax]])])
 
-  phases <- c(ind$eIndices-ind$sIndices,
-              ind$sIndices[2:length(ind$sIndices)]-ind$eIndices[1:(length(ind$eIndices)-1)])
-  phases <- phases[! phases%in%0]
+        R    <- c(ind$eIndices-ind$sIndices, ind$sIndices[2:length(ind$sIndices)]-ind$eIndices[1:(length(ind$eIndices)-1)])
+        R    <- R[! R%in%0]
+        Runs <- var(R, na.rm = TRUE)
+        }
+    } else {
+      warning("Unable to replicate classical Runs output, returns NA")
+      Runs <- NA
+    }
 
+  attr(Runs,'Name')     <- 'Runs'
+  attr(Runs,'y')        <- y
+  attr(Runs, 'results') <- results
 
-#  if(y[2] > y[1]) {# ascending PhL only!
-#    phases <- ind$sIndices[2:length(ind$sIndices)]-ind$eIndices[1:(length(ind$eIndices)-1)]
-#  } else {
-#    phases <- ind$eIndices-ind$sIndices
-#    phases <- phases[! phases%in%0]
-#  }
-
-
-  return(var(phases, na.rm = TRUE))
+  return(Runs)
 }
 
 # Repetition Distance -----------------------------------------------------
 
 #' Repetition Distance
+#'
+#' @inheritParams allRNG
+#'
 #' @rdname classicalRNG
+#' @export
+#'
 repDistance <- function(y, minScale = NA, maxScale = NA){
 
   y   <- check_y(y, minScale = minScale, maxScale = maxScale)
@@ -604,13 +831,24 @@ repDistance <- function(y, minScale = NA, maxScale = NA){
   tmp <- purrr::map(responseAlternatives, function(v) diff(which(y==v)))
   RD  <- table(unlist(tmp))
 
-  return(RD)
+  RDList        <- as.list(RD)
+  names(RDList) <- c(paste0("RD_", names(RD)))
+
+  attr(RDList,'Name') <- 'repetition Distance'
+  attr(RDList,'y')    <- y
+
+  return(RDList)
 }
 
 # Repetition Gap ----------------------------------------------------------
 
 #' Repetition Gap
+#'
+#' @inheritParams allRNG
+#'
 #' @rdname classicalRNG
+#' @export
+#'
 repGap <- function(y, minScale = NA, maxScale = NA){
 
   y        <- check_y(y, minScale = minScale, maxScale = maxScale)
@@ -621,15 +859,18 @@ repGap <- function(y, minScale = NA, maxScale = NA){
   tmp <- purrr::map(responseAlternatives, function(v) diff(which(y==v)))
   RD  <- table(unlist(tmp))
 
-  RD_median <- stats::median(unlist(tmp))
-  RD_mean   <- mean(unlist(tmp))
-  RD_mode   <- as.numeric(names(which.max(RD)))
+  median <- stats::median(unlist(tmp))
+  mean   <- mean(unlist(tmp))
+  mode   <- as.numeric(names(which.max(RD)))
 
   rm(tmp,RD)
 
-  return(list(RD_median = RD_median,
-              RD_mean   = RD_mean,
-              RD_mode   = RD_mode))
+  attr(repGap,'Name') <- 'repGap'
+  attr(repGap,'y')    <- y
+
+  return(list(RG_median = median,
+              RG_mean   = mean,
+              RG_mode   = mode))
 }
 
 # Phi index ---------------------------------------------------------------
@@ -638,12 +879,12 @@ repGap <- function(y, minScale = NA, maxScale = NA){
 #'
 #' @inheritParams allRNG
 #' @param maxOrder
-
 #'
 #' @rdname classicalRNG
 #' @export
 #'
-phiIndex <- function(y, minScale = NA, maxScale = NA, responseAlternatives = NA, maxOrder = 7){
+phiIndex <- function(y, minScale = NA, maxScale = NA, responseAlternatives = NA,
+                     maxOrder = 7){
 
   y        <- check_y(y, minScale = minScale, maxScale = maxScale, responseAlternatives = responseAlternatives)
   minIndex <- attr(y,"minScale")
@@ -764,8 +1005,12 @@ phiIndex <- function(y, minScale = NA, maxScale = NA, responseAlternatives = NA,
 
   } # A
 
-  names(phiList) <- c(NA,paste0("phi",2:maxOrder))
+  names(phiList) <- c(NA,paste0("Phi_",2:maxOrder))
   phiList[[1]] <- NULL
+
+  attr(phiList,'Name') <- 'phiIndex'
+  attr(phiList,'y')  <- y
 
   return(phiList)
 }
+

@@ -8,6 +8,7 @@
 \alias{RF}
 \alias{Coupon}
 \alias{NSQ}
+\alias{FOD}
 \alias{Adjacency}
 \alias{TPI}
 \alias{PhL}
@@ -19,23 +20,30 @@
 \usage{
 Redundancy(y, minScale = NA, maxScale = NA)
 
-RNG(y, minScale = NA, maxScale = NA)
+RNG(y, minScale = NA, maxScale = NA, results = c("classical", "randseqR")[2])
 
-RNG2(y, minScale = NA, maxScale = NA)
+RNG2(y, minScale = NA, maxScale = NA, results = c("classical", "randseqR")[2])
 
 RF(y, minScale = NA, maxScale = NA)
 
 Coupon(y, minScale = NA, maxScale = NA)
 
-NSQ(y, minScale = NA, maxScale = NA)
+NSQ(y, minScale = NA, maxScale = NA, results = c("classical", "randseqR")[2])
 
-Adjacency(y, minScale = NA, maxScale = NA)
+FOD(y, minScale = NA, maxScale = NA, results = c("classical", "randseqR")[2])
+
+Adjacency(
+  y,
+  minScale = NA,
+  maxScale = NA,
+  results = c("classical", "randseqR")[2]
+)
 
 TPI(y, minScale = NA, maxScale = NA)
 
 PhL(y, minScale = NA, maxScale = NA)
 
-Runs(y, minScale = NA, maxScale = NA)
+Runs(y, minScale = NA, maxScale = NA, results = c("classical", "randseqR")[2])
 
 repDistance(y, minScale = NA, maxScale = NA)
 
@@ -55,6 +63,8 @@ phiIndex(
 \item{minScale}{Minimum expected value. If \code{y} is a character vector this should refer to the lowest numeric code used.}
 
 \item{maxScale}{Maximum expected value. If \code{y} is a character vector this should refer to the highest numeric code used.}
+
+\item{results}{either 'randseqR' (default) or 'classical. randseqR gives a better consistency among RNG measures, while classical gives output comparible to RGcalc by Towse and Neil (1998)}
 
 \item{responseAlternatives}{An optional vector of possible response alternatives. If \code{NA}, \code{responseAlternatives} will be set to \code{seq(minScale,maxScale)}}
 

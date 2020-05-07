@@ -30,18 +30,6 @@ randseqR::PhiIndex(y = y, minScale = 1, maxScale = 9, responseAlternatives = c(1
 minScale <- 1
 maxScale <- 9
 
-
-
-
-
-
-
-
-
-
-
-
-
 # symHelper <- function(sym_num){
 #   out <- sym_num
 #   i <- 1
