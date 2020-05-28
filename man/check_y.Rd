@@ -27,7 +27,7 @@ check_y(
 \item{toNumeric}{If \code{TRUE}, the unique elements in a non-numeric vector will be labelled by an integer value.}
 }
 \value{
-Trasformed \code{y} (if necessary), or, an error message.
+Transformed \code{y} (if necessary), or, an error message.
 }
 \description{
 Check vector

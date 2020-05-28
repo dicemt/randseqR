@@ -9,7 +9,8 @@ allRNG(
   minScale = NA,
   maxScale = NA,
   responseAlternatives = NA,
-  R = TRUE,
+  results = c("classical", "randseqR")[2],
+  Redundancy = TRUE,
   RNG = TRUE,
   RNG2 = TRUE,
   RF = TRUE,
@@ -22,7 +23,7 @@ allRNG(
   Runs = TRUE,
   repDistance = TRUE,
   repGap = TRUE,
-  Phi = TRUE
+  PhiIndex = TRUE
 )
 }
 \arguments{
@@ -34,7 +35,7 @@ allRNG(
 
 \item{responseAlternatives}{An optional vector of possible response alternatives. If \code{NA}, \code{responseAlternatives} will be set to \code{seq(minScale,maxScale)}}
 
-\item{R}{Redundancy (default = \code{TRUE})}
+\item{results}{Either 'randseqR' (default) or 'classical'.}
 
 \item{RNG}{RNG (default = \code{TRUE})}
 
@@ -52,13 +53,15 @@ allRNG(
 
 \item{Runs}{Runs (default = \code{TRUE})}
 
-\item{Phi}{Phi index (default = \code{TRUE})}
+\item{R}{Redundancy (default = \code{TRUE})}
 
 \item{PhaseLength}{PhaseLength (default = \code{TRUE})}
 
 \item{RepDistance}{Repetition Distance (default = \code{TRUE})}
 
 \item{RepGap}{Repetition Gap (default = \code{TRUE})}
+
+\item{Phi}{Phi index (default = \code{TRUE})}
 }
 \value{
 A list object of classical RNG task measures.
