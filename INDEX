@@ -1,5 +1,0 @@
-allRNG                        Get all classical RNG measures
-check_y                       Check vector
-classicalRNG                  Measures of the classical RNG task
-findTPIs                      Find turning points
-TPIhelper                     Find peaks/troughs

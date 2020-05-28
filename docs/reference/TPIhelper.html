@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Find turning points — findTPIs • randseqR</title>
+<title>Find peaks/troughs — TPIhelper • randseqR</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Find turning points — findTPIs" />
-<meta property="og:description" content="Find turning points" />
+<meta property="og:title" content="Find peaks/troughs — TPIhelper" />
+<meta property="og:description" content="Find peaks/troughs" />
 
 
 
@@ -108,29 +108,29 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Find turning points</h1>
+    <h1>Find peaks/troughs</h1>
     <small class="dont-index">Source: <a href='https://github.com/FredHasselman/randseqR/blob/master/R/ClassicRNG.R'><code>R/ClassicRNG.R</code></a></small>
-    <div class="hidden name"><code>findTPIs.Rd</code></div>
+    <div class="hidden name"><code>TPIhelper.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Find turning points</p>
+    <p>Find peaks/troughs</p>
     </div>
 
-    <pre class="usage"><span class='fu'>findTPIs</span>(<span class='no'>y</span>)</pre>
+    <pre class="usage"><span class='fu'>TPIhelper</span>(<span class='no'>y</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>y</th>
-      <td><p>Numeric vector.</p></td>
+      <td><p>Numeric vector</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A list object with <code>start</code> and <code>end</code> indices of turning points.</p>
+    <p>converted y with values 1 (trough); 2 (decrease); 3 (same); 5 (increase); 5 (peak)</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

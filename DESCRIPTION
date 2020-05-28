@@ -20,6 +20,6 @@ Imports:
     magrittr,
     DescTools
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 URL: https://github.com/FredHasselman/randseqR
 BugReports: https://github.com/FredHasselman/randseqR/issues

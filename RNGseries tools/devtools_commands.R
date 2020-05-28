@@ -30,7 +30,7 @@ usethis::use_pkgdown()
 
 tools::Rdindex(RdFiles = "C:/Users/woomens/Documents/GitHub/randseqR/man",outFile = "INDEX")
 devtools::document(roclets=c('rd', 'collate', 'namespace','vignette'))
-devtools::build_vignettes()
+# devtools::build_vignettes()
 devtools::install(build_vignettes = TRUE)
 pkgdown::build_site(lazy = FALSE, preview = TRUE)
 

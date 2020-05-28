@@ -39,3 +39,4 @@ rsconnect/
 .Rproj.user
 
 RNGseries tools/
+.DS_Store

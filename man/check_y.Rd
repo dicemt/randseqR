@@ -34,7 +34,7 @@ Check vector
 }
 \examples{
 
-y <- letters
-check_y(y)
+y <- sample(letters,10)
+check_y(y, responseAlternatives=letters)
 
 }

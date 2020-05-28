@@ -404,6 +404,7 @@ allRNG <- function(y,
 
 }
 
+
 #' Measures of the classical RNG task
 #'
 #' Individual functions to get the measures of the classical RNG task. Use function `allRNG()` to get a list with all (or selected) measures.
@@ -419,7 +420,6 @@ allRNG <- function(y,
 #'
 #' @seealso [allRNG()] to get *all*, or, a selected list of measures.
 #'
-#' @export
 #' @examples
 #'
 #' y <- round(runif(100,1,9))
@@ -427,6 +427,7 @@ allRNG <- function(y,
 #' R(y, maxScale = 9)
 #'
 NULL
+# > NULL
 
 # Redundancy --------------------------------------------------------------
 
@@ -491,7 +492,7 @@ RNG <- function(y, minScale = NA, maxScale = NA,
   attr(RNG,'Name')     <- 'RNG'
   attr(RNG,'y')        <- y
 
- 
+
   attr(RNG,'results')  <- results
 
 #  attr(RNG,'minScale') <- minScale
