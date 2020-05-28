@@ -110,6 +110,7 @@ TPIhelper <- function(y){
 #'
 findTPIs <- function(y){
 
+
   # y <- casnet::ts_symbolic(y, usePlateaus = TRUE)
   # y <- attr(y, "sym_numeric")
 
@@ -124,6 +125,7 @@ findTPIs <- function(y){
   # names(yTrough) <- paste0(1:length(yTrough), "trough")
   ind            <- list(which(yPeak[1:(NROW(y)-1)] - yPeak[2:NROW(y)]>0),
                           which(yTrough[1:(NROW(y)-1)] - yTrough[2:NROW(y)]>0))
+
 
   return(list(sIndices = ind[[startWith]],
               eIndices = ind[[-startWith]]))
@@ -141,8 +143,8 @@ findTPIs <- function(y){
 #'
 #' @examples
 #'
-#' y <- letters
-#' check_y(y)
+#' y <- sample(letters,10)
+#' check_y(y, responseAlternatives=letters)
 #'
 check_y <- function(y, minScale=NA, maxScale=NA, responseAlternatives = NA,
                     noZero = FALSE, toNumeric = TRUE){
@@ -417,6 +419,7 @@ allRNG <- function(y,
 #'
 #' @seealso [allRNG()] to get *all*, or, a selected list of measures.
 #'
+#' @export
 #' @examples
 #'
 #' y <- round(runif(100,1,9))
@@ -453,6 +456,7 @@ Redundancy <- function(y, minScale = NA, maxScale = NA){
 # RNG ---------------------------------------------------------------------
 
 #' RNG
+
 #'
 #' @inheritParams allRNG
 #'
@@ -462,6 +466,7 @@ Redundancy <- function(y, minScale = NA, maxScale = NA){
 RNG <- function(y, minScale = NA, maxScale = NA,
                 results = c("classical", "randseqR")[2]){
 
+
   y        <- check_y(y, minScale = minScale, maxScale = maxScale)
   minScale <- attr(y,'minScale')
   maxScale <- attr(y,'maxScale')
@@ -469,6 +474,7 @@ RNG <- function(y, minScale = NA, maxScale = NA,
 
   o_e      <- observed_expected(y, minScale = minScale, maxScale = maxScale, lag = 1)
   combis   <- o_e$combis
+
 
   if(results == "randseqR") {
     observed <- c(o_e$observed)
@@ -484,7 +490,13 @@ RNG <- function(y, minScale = NA, maxScale = NA,
 
   attr(RNG,'Name')     <- 'RNG'
   attr(RNG,'y')        <- y
-  attr(RNG, 'results') <- results
+
+ 
+  attr(RNG,'results')  <- results
+
+#  attr(RNG,'minScale') <- minScale
+#  attr(RNG,'maxScale') <- maxScale
+
 
   return(RNG)
 }
@@ -810,6 +822,7 @@ Runs <- function(y, minScale = NA, maxScale = NA,
   attr(Runs, 'results') <- results
 
   return(Runs)
+
 }
 
 # Repetition Distance -----------------------------------------------------
