@@ -407,12 +407,17 @@ allRNG <- function(y,
 
 #' Measures of the classical RNG task
 #'
-#' Individual functions to get the measures of the classical RNG task. Use function `allRNG()` to get a list with all (or selected) measures.
+#' Individual functions to get the measures of the classical RNG task (see Details below). Use function `allRNG()` to get a list with all (or selected) measures.
 #'
 #' @param y A sequence of symbols. If `y` is non-numeric, unique elements will be labelled by an integer value.
 #' @param minScale Minimum expected value. If `y` is a character vector this should refer to the lowest numeric code used.
 #' @param maxScale Maximum expected value. If `y` is a character vector this should refer to the highest numeric code used.
 #' @param results either 'randseqR' (default) or 'classical. randseqR gives a better consistency among RNG measures, while classical gives output comparible to RGcalc by Towse and Neil (1998)
+#'
+#' @details Avialable classical measures:
+#' - **Redundancy**: Measures how,..
+#' - **RNG**: Measures of
+#' - **RNG2**: blah
 #'
 #' @name classicalRNG
 #'
@@ -433,6 +438,7 @@ NULL
 
 
 #' Redundancy
+#'
 #'
 #' @inheritParams allRNG
 #'

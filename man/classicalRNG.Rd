@@ -74,7 +74,15 @@ phiIndex(
 Output
 }
 \description{
-Individual functions to get the measures of the classical RNG task. Use function \code{allRNG()} to get a list with all (or selected) measures.
+Individual functions to get the measures of the classical RNG task (see Details below). Use function \code{allRNG()} to get a list with all (or selected) measures.
+}
+\details{
+Avialable classical measures:
+\itemize{
+\item \strong{Redundancy}: Measures how,..
+\item \strong{RNG}: Measures of
+\item \strong{RNG2}: blah
+}
 }
 \examples{
 
