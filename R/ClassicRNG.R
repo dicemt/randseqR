@@ -520,7 +520,6 @@ RNG <- function(y, minScale = NA, maxScale = NA,
 RNG2 <- function(y, minScale = NA, maxScale = NA,
                  results = c("classical", "randseqR")[2]){
 
-  y        <- check_y(y, minScale = minScale, maxScale = maxScale)
   minScale <- attr(y,'minScale')
   maxScale <- attr(y,'maxScale')
   responseAlternatives <- attr(y,"responseAlternatives")
@@ -800,7 +799,6 @@ PhL <- function(y, minScale = NA, maxScale = NA){
 Runs <- function(y, minScale = NA, maxScale = NA,
                  results = c("classical", "randseqR")[2]){
 
-  y        <- check_y(y, minScale = minScale, maxScale = maxScale)
   minScale <- attr(y,'minScale')
   maxScale <- attr(y,'maxScale')
   responseAlternatives <- attr(y,"responseAlternatives")
