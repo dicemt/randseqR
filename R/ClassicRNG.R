@@ -203,14 +203,14 @@ check_y <- function(y, minScale=NA, maxScale=NA, responseAlternatives = NA,
   }
 
 
-   if(!all(y%in%responseAlternatives)){
-     stop("Elements in y do not correspond to elements of responseAlternatives!")
-   }
+   #if(!all(y%in%responseAlternatives)){
+   #  stop("Elements in y do not correspond to elements of responseAlternatives!")
+   #}
 
 
-   if(length(minScale:maxScale)!=length(responseAlternatives)){
-     stop("length of minScale:maxScale must be equal to lenght of responseAltenatives")
-  }
+   #if(length(minScale:maxScale)!=length(responseAlternatives)){
+   #  stop("length of minScale:maxScale must be equal to length of responseAltenatives")
+   #}
 
 
   if(length(transformation)==0){transformation <- "none"}
@@ -520,6 +520,7 @@ RNG <- function(y, minScale = NA, maxScale = NA,
 RNG2 <- function(y, minScale = NA, maxScale = NA,
                  results = c("classical", "randseqR")[2]){
 
+  y        <- check_y(y, minScale = minScale, maxScale = maxScale)
   minScale <- attr(y,'minScale')
   maxScale <- attr(y,'maxScale')
   responseAlternatives <- attr(y,"responseAlternatives")
@@ -799,6 +800,7 @@ PhL <- function(y, minScale = NA, maxScale = NA){
 Runs <- function(y, minScale = NA, maxScale = NA,
                  results = c("classical", "randseqR")[2]){
 
+  y        <- check_y(y, minScale = minScale, maxScale = maxScale)
   minScale <- attr(y,'minScale')
   maxScale <- attr(y,'maxScale')
   responseAlternatives <- attr(y,"responseAlternatives")
